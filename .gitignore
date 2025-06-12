@@ -10,3 +10,5 @@
 
 # Ensure all VS Code config files are tracked
 !.vscode/
+!/.vscode/settings.json
+!/.vscode/extensions.json
