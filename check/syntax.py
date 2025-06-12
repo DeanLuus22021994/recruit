@@ -6,9 +6,10 @@ Simple syntax check for model files.
 import ast
 import os
 import sys
+from typing import Optional, Tuple
 
 
-def check_syntax(file_path):
+def check_syntax(file_path: str) -> Tuple[bool, Optional[str]]:
     """Check if a Python file has valid syntax."""
     try:
         with open(file_path, "r", encoding="utf-8") as f:
@@ -19,13 +20,13 @@ def check_syntax(file_path):
         return True, None
     except SyntaxError as e:
         return False, f"Syntax error in {file_path}: {e}"
-    except Exception as e:
+    except (OSError, IOError, UnicodeDecodeError) as e:
         return False, f"Error reading {file_path}: {e}"
 
 
-def main():
+def main() -> int:
     """Check syntax of all model files."""
-    project_root = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     # Files to check
     model_files = [
@@ -63,9 +64,9 @@ def main():
     if all_good:
         print("\n🎉 All model files have valid syntax!")
         return 0
-    else:
-        print("\n❌ Some files have syntax errors.")
-        return 1
+
+    print("\n❌ Some files have syntax errors.")
+    return 1
 
 
 if __name__ == "__main__":
