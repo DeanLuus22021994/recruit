@@ -11,7 +11,7 @@ from recruit_models.interviews import (
 
 __all__ = [
     "InterviewInvitation",
-    "InterviewRequest", 
+    "InterviewRequest",
     "Available",
     "Exclusion",
     "generate_invitation",
