@@ -5,6 +5,6 @@ from .models import Recruiter
 
 
 def view_recruiters(request: HttpRequest) -> HttpResponse:
-    recruiters = Recruiter.objects.all()
+    recruiters = Recruiter.objects.all()  # type: ignore
     context = {"recruiters": recruiters}
     return render(request, "recruiters/recruiters.html", context)

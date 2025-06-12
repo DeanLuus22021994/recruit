@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import Recruiter
 
 
-class RecruiterAdmin(admin.ModelAdmin[Recruiter]):
+class RecruiterAdmin(admin.ModelAdmin):  # type: ignore
     exclude = ("password", "last_login", "is_staff", "thumb")
 
 
