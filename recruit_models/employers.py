@@ -63,7 +63,7 @@ def update_user_profile(
     sender: Any, instance: Employer, created: bool, **kwargs: Any
 ) -> None:
     """Update user profile when employer is created."""
-    from .accounts import UserProfile
+    from recruit_models.accounts import UserProfile
 
     # Mark unused parameters
     _ = sender

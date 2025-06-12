@@ -1,6 +1,5 @@
 """Models for the interviews application."""
 
-from types.interviews import STATUS_CHOICES
 from typing import Any
 
 import shortuuid
@@ -8,8 +7,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 
-from models.candidates import Candidate
-from models.jobs import Job
+from recruit_models.candidates import Candidate
+from recruit_models.jobs import Job
+from recruit_types.interviews import STATUS_CHOICES
 
 
 class InterviewInvitation(models.Model):
