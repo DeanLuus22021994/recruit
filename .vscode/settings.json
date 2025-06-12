@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "autofixture",
+    "availabiity",
     "boto",
     "botocore",
     "CONFIRMATON",
@@ -8,6 +9,7 @@
     "dateutil",
     "defusedxml",
     "devcontainers",
+    "emailaddress",
     "genutils",
     "httplib",
     "ipython",
@@ -15,6 +17,7 @@
     "libfreetype",
     "libjpeg",
     "localflavor",
+    "logining",
     "MEDIAFILES",
     "modelfields",
     "noninteractive",
@@ -37,6 +40,7 @@
     "socialaccount",
     "testpass",
     "testrecruiter",
-    "traitlets"
+    "traitlets",
+    "urlresolvers"
   ]
 }

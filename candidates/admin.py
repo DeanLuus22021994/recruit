@@ -1,42 +1,67 @@
+"""Django admin configuration for candidates app."""
+
 from django.contrib import admin
 
-from .models import CandidateRequirements, CandidateDocument, Candidate
 from interviews.models import InterviewRequest
-from accounts.models import UserProfile
 
-class InterviewRequestInline(admin.StackedInline):
-	model = InterviewRequest
+from .models import Candidate, CandidateDocument, CandidateRequirements
 
-class CandidateRequirementsInline(admin.StackedInline):
-	model = CandidateRequirements
 
-class CandidateDocument(admin.StackedInline):
-	model = CandidateDocument
+class InterviewRequestInline(admin.StackedInline[InterviewRequest]):
+    """Inline admin for interview requests."""
 
-class CandidateAdmin(admin.ModelAdmin):
+    model = InterviewRequest
 
-	def email(obj):
-		return ('%s' % (obj.user.email))
-	email.admin_order_field = 'user__email'
 
-	def name(obj):
-		return ('%s' % (obj.user.get_full_name()))
+class CandidateRequirementsInline(admin.StackedInline[CandidateRequirements]):
+    """Inline admin for candidate requirements."""
 
-	def citizenship(obj):
-		return ('%s' % (obj.user.userprofile.citizenship))
-	citizenship.admin_order_field = 'user__userprofile__citizenship'
+    model = CandidateRequirements
 
-	def date_of_birth(obj):
-		return ('%s' % (obj.date_of_birth or obj.birth_year))
-	date_of_birth.admin_order_field = 'date_of_birth' 
 
-	# inlines = (CandidateRequirementsInline,)
-	list_filter = ('user__userprofile__citizenship', 'gender')
-	list_display = (email, name, citizenship, date_of_birth, 'gender')	
-	inlines = (CandidateDocument, InterviewRequestInline)
-	exclude = ('password', 'last_login', 'is_admin', 'thumb')
-	search_fields = ('date_of_birth', 'birth_year', 'user__email', 
-		'user__first_name', 'user__last_name', 'user__userprofile__citizenship',)
+class CandidateDocumentInline(admin.StackedInline[CandidateDocument]):
+    """Inline admin for candidate documents."""
+
+    model = CandidateDocument
+
+
+class CandidateAdmin(admin.ModelAdmin[Candidate]):
+    """Admin interface for Candidate model."""
+
+    def email(self, obj: Candidate) -> str:
+        """Return candidate's email address."""
+        return f"{obj.user.email}"
+
+    email.admin_order_field = "user__email"  # type: ignore[attr-defined]
+
+    def name(self, obj: Candidate) -> str:
+        """Return candidate's full name."""
+        return f"{obj.user.get_full_name()}"
+
+    def citizenship(self, obj: Candidate) -> str:
+        """Return candidate's citizenship."""
+        return f"{obj.user.userprofile.citizenship}"
+
+    citizenship.admin_order_field = "user__userprofile__citizenship"  # type: ignore[attr-defined]
+
+    def date_of_birth(self, obj: Candidate) -> str:
+        """Return candidate's date of birth or birth year."""
+        return f"{obj.date_of_birth or obj.birth_year}"
+
+    date_of_birth.admin_order_field = "date_of_birth"  # type: ignore[attr-defined]
+
+    list_filter = ("user__userprofile__citizenship", "gender")
+    list_display = (email, name, citizenship, date_of_birth, "gender")
+    inlines = (CandidateDocumentInline, InterviewRequestInline)
+    exclude = ("password", "last_login", "is_admin", "thumb")
+    search_fields = (
+        "date_of_birth",
+        "birth_year",
+        "user__email",
+        "user__first_name",
+        "user__last_name",
+        "user__userprofile__citizenship",
+    )
+
 
 admin.site.register(Candidate, CandidateAdmin)
-

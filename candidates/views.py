@@ -1,121 +1,139 @@
-from django.shortcuts import render
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+"""Views for the candidates application."""
+
+from typing import Optional
+
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse  # type: ignore[import-untyped]
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+
 from accounts.models import UserProfile
 
-from .models import Candidate, CandidateDocument
 from .forms import UserApplyStep1Form, UserApplyStep2Form
-
-def apply(request):
-
-	key = request.GET.get('key', None)
-	user = UserProfile.verify_token(key)
-
-	if not key and request.method == 'POST':
-		
-		form = UserApplyStep1Form(request.POST)
-
-		if form.is_valid():
-			data = form.data
-			first_name = data['first_name']
-			last_name = data['last_name']
-			email = data['email']
-			citizenship = data['citizenship']
-			skype_id = data['skype_id']
-			timezone = data['timezone']
-
-			user, created = User.objects.get_or_create(
-				first_name=first_name,
-				last_name=last_name,
-				email=email,
-				username=email
-				)
-
-			if not created:
-				messages.add_message(request, messages.ERROR,
-					email + ' has already been registered.')
-			else:
-				userprofile = UserProfile(
-					user=user,
-					timezone=timezone,
-					citizenship=citizenship,
-					skype_id=skype_id,
-					user_type='Candidate'
-					)
-
-				userprofile.save()
-				
-				key = user.userprofile.generate_token()
-				
-				return HttpResponseRedirect(
-					reverse('candidate_apply') + '?key=' + key)
+from .models import Candidate, CandidateDocument
 
 
-	elif not key and request.method == 'GET':
-		form = UserApplyStep1Form()
+def apply(request: HttpRequest) -> HttpResponse:
+    """Handle candidate application process."""
+    key = request.GET.get("key", None)
+    user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
 
-	elif key and user and request.method == 'POST':
+    if not key and request.method == "POST":
 
-		form = UserApplyStep2Form(request.POST, request.FILES)
-	
-		if form.is_valid():
-			files = form.files
-			data = form.data
-	
-			try:
-				candidate = user.candidate
-				candidate.birth_year = data['birth_year']
-				candidate.gender = data['gender']
-				candidate.education = data['education']
-				candidate.education_major = data['education_major']
-				candidate.image = files['image']
-				candidate.save()
-			except Candidate.DoesNotExist:
-				candidate = Candidate.objects.create(user=user, 
-					birth_year=data['birth_year'],
-					gender=data['gender'],
-					education=data['education'],
-					education_major=data['education_major'],
-					image=files['image']
-					)
-			CandidateDocument.objects.create(
-				candidate=candidate,
-				document=files['resume'],
-				document_type='Resume'
-				)
+        form = UserApplyStep1Form(request.POST)
 
-			messages.add_message(request, messages.SUCCESS,
-				'Form submitted successfully.')
+        if form.is_valid():
+            data = form.data
+            first_name = data["first_name"]
+            last_name = data["last_name"]
+            email = data["email"]
+            citizenship = data["citizenship"]
+            skype_id = data["skype_id"]
+            timezone = data["timezone"]
 
-			return HttpResponseRedirect(
-					reverse('candidate_apply_success') + '?key=' + key)
+            user, created = User.objects.get_or_create(  # type: ignore[misc]
+                first_name=first_name, last_name=last_name, email=email, username=email
+            )
 
-	elif key and user and request.method == 'GET':
-		form = UserApplyStep2Form()
+            if not created:
+                messages.add_message(
+                    request, messages.ERROR, email + " has already been registered."
+                )
+            else:
+                userprofile = UserProfile(
+                    user=user,
+                    timezone=timezone,
+                    citizenship=citizenship,
+                    skype_id=skype_id,
+                    user_type="Candidate",
+                )
 
-	else:
-		messages.add_message(request, messages.ERROR,
-			'A valid application key is required to submit documents. ' +
-			'Please contact the administrator.')
-		form = None
+                userprofile.save()
 
-	return render(request, 'candidates/apply.html', {'form': form})
+                key = user.userprofile.generate_token()  # type: ignore[misc]
 
-def apply_success(request):
-	key = request.GET.get('key', None)
-	user = UserProfile.verify_token(key)
+                return HttpResponseRedirect(reverse("candidate_apply") + "?key=" + key)
 
-	if not key or not user:
-		messages.add_message(request, messages.ERROR,
-			'A valid application key is required to view this page.')
-	else:
-		jobs_url = reverse('jobs') + '?key=' + key
-		availability_url = reverse('available', args=[user.id]) + '?key=' + key
+    elif not key and request.method == "GET":
+        form = UserApplyStep1Form()
 
-	return render(request, 'candidates/apply.html', 
-			{'success': 'success',
-			 'jobs_url': jobs_url,
-			 'availability_url': availability_url
-			})
+    elif key and user and request.method == "POST":
+
+        form = UserApplyStep2Form(request.POST, request.FILES)
+
+        if form.is_valid():
+            files = form.files
+            data = form.data
+
+            try:
+                candidate = user.candidate  # type: ignore[misc]
+                candidate.birth_year = data["birth_year"]
+                candidate.gender = data["gender"]
+                candidate.education = data["education"]
+                candidate.education_major = data["education_major"]
+                candidate.image = files["image"]
+                candidate.save()
+            except Candidate.DoesNotExist:  # type: ignore[misc]
+                candidate = Candidate.objects.create(  # type: ignore[misc]
+                    user=user,
+                    birth_year=data["birth_year"],
+                    gender=data["gender"],
+                    education=data["education"],
+                    education_major=data["education_major"],
+                    image=files["image"],
+                )
+            CandidateDocument.objects.create(  # type: ignore[misc]
+                candidate=candidate, document=files["resume"], document_type="Resume"
+            )
+
+            messages.add_message(
+                request, messages.SUCCESS, "Form submitted successfully."
+            )
+
+            return HttpResponseRedirect(
+                reverse("candidate_apply_success") + "?key=" + key
+            )
+
+    elif key and user and request.method == "GET":
+        form = UserApplyStep2Form()
+
+    else:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            "A valid application key is required to submit documents. "
+            + "Please contact the administrator.",
+        )
+        form = None
+
+    return render(request, "candidates/apply.html", {"form": form})
+
+
+def apply_success(request: HttpRequest) -> HttpResponse:
+    """Display application success page."""
+    key = request.GET.get("key", None)
+    user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
+
+    jobs_url = None
+    availability_url = None
+
+    if not key or not user:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            "A valid application key is required to view this page.",
+        )
+    else:
+        jobs_url = reverse("jobs") + "?key=" + key
+        availability_url = reverse("available", args=[user.id]) + "?key=" + key
+
+    return render(
+        request,
+        "candidates/apply.html",
+        {
+            "success": "success",
+            "jobs_url": jobs_url,
+            "availability_url": availability_url,
+        },
+    )
