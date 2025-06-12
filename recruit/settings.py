@@ -163,14 +163,14 @@ AWS_HEADERS = {
     "Expires": "Thu, 31 Jan 2030 20:00:00 UTC",
     "Cache-Control": "max-age=94608000",
 }
-AWS_S3_CUSTOM_DOMAIN = "%s.s3.amazonaws.com" % AWS_STORAGE_BUCKET_NAME
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 STATICFILES_LOCATION = "static"
 STATICFILES_STORAGE = "recruit.custom_storages.StaticStorage"
-STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/"
 
 MEDIAFILES_LOCATION = "media"
-MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/"
 DEFAULT_FILE_STORAGE = "recruit.custom_storages.MediaStorage"
 
 # All auth configurations
