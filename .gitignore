@@ -4,3 +4,6 @@
 **/migrations/
 # Ensure all devcontainer files are tracked
 !.devcontainer/
+
+# Ensure all VS Code Insiders config files are tracked
+!.vscode-insiders/
