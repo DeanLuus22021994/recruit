@@ -7,4 +7,4 @@ class RecruiterAdmin(admin.ModelAdmin):  # type: ignore
     exclude = ("password", "last_login", "is_staff", "thumb")
 
 
-admin.site.register(Recruiter, RecruiterAdmin)
+admin.site.register(Recruiter, RecruiterAdmin)  # type: ignore[misc]

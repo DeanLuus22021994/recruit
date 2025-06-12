@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class RecruitersConfig(AppConfig):
-    name = 'recruiters'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "recruiters"
