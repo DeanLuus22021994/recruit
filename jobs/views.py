@@ -20,8 +20,8 @@ def add_interview_requests(
 ) -> None:
     """Add interview requests for the given user and job IDs."""
     try:
-        candidate = user.candidate  # type: ignore[misc]
-    except Candidate.DoesNotExist:  # type: ignore[misc]
+        candidate = user.candidate
+    except Candidate.DoesNotExist:
         messages.add_message(request, messages.ERROR, "This user is not a candidate.")
         return
     except Exception as e:
@@ -29,7 +29,8 @@ def add_interview_requests(
         return
 
     for job_id in jobs_ids:
-        ir = InterviewRequest(candidate=candidate, job=Job.objects.get(pk=int(job_id)))  # type: ignore[misc]
+        job = Job.objects.get(pk=int(job_id))
+        ir = InterviewRequest(candidate=candidate, job=job)
         ir.save()
 
     if "requested_jobs" in request.session:
@@ -41,11 +42,11 @@ def add_interview_requests(
 def view_jobs(request: HttpRequest) -> Union[HttpResponseRedirect, HttpResponse]:
     """Display jobs and handle job application requests."""
     key = request.GET.get("key", None)
-    user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
+    user: Optional[User] = UserProfile.verify_token(key)
     context: dict[str, Any] = {}
 
     if request.method == "GET":
-        jobs = Job.objects.all()  # type: ignore[misc]
+        jobs = Job.objects.all()
         context = {"jobs": jobs}
 
     if request.method == "POST":
@@ -68,6 +69,6 @@ def view_jobs(request: HttpRequest) -> Union[HttpResponseRedirect, HttpResponse]
 
 def view_job_details(request: HttpRequest, job_id: str) -> HttpResponse:
     """Display details for a specific job."""
-    job = Job.objects.get(id=job_id)  # type: ignore[misc]
+    job = Job.objects.get(id=job_id)
     context = {"job": job}
     return render(request, "jobs/details.html", context)

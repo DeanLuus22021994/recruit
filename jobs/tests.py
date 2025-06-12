@@ -21,7 +21,7 @@ class JobModelTest(TestCase):
         )
 
         # Create a recruiter
-        self.recruiter = Recruiter.objects.create(  # type: ignore[misc]
+        self.recruiter = Recruiter.objects.create(
             user=self.user,
             phone_number="+1234567890",
             date_of_birth=date(1990, 1, 1),
@@ -30,7 +30,7 @@ class JobModelTest(TestCase):
 
     def test_country_creation(self) -> None:
         """Test that a country can be created."""
-        country = Country.objects.create(country="United States")  # type: ignore[misc]
+        country = Country.objects.create(country="United States")
         self.assertEqual(str(country), "United States")
 
     def test_job_str_method(self) -> None:

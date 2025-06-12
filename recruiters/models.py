@@ -7,9 +7,7 @@ from django.db import models
 from django.db.models.signals import post_save
 
 try:
-    from phonenumber_field.modelfields import (
-        PhoneNumberField,  # type: ignore[import-untyped]
-    )
+    from phonenumber_field.modelfields import PhoneNumberField
 except ImportError:
     # Fallback if phonenumber_field is not available
     PhoneNumberField = models.CharField
@@ -40,14 +38,14 @@ class Recruiter(models.Model):
         """Save the recruiter instance with thumbnail generation."""
         from recruit.utils import generate_thumbnail
 
-        self.thumb = generate_thumbnail(self.image)  # type: ignore[misc]
+        self.thumb = generate_thumbnail(self.image)
         super(Recruiter, self).save(*args, **kwargs)
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the recruiter instance and associated files."""
         from recruit.utils import delete_from_s3
 
-        delete_from_s3([self.image, self.thumb])  # type: ignore[misc]
+        delete_from_s3([self.image, self.thumb])
         return super(Recruiter, self).delete(*args, **kwargs)
 
 
@@ -61,9 +59,7 @@ def update_user_profile(
     _ = kwargs  # Mark as intentionally unused
 
     if created:
-        UserProfile.objects.filter(user=instance.user).update(
-            user_type="Recruiter"
-        )  # type: ignore[misc]
+        UserProfile.objects.filter(user=instance.user).update(user_type="Recruiter")
 
 
 post_save.connect(update_user_profile, sender=Recruiter)

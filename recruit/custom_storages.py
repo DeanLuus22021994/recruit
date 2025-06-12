@@ -5,19 +5,17 @@ from typing import Any
 from django.conf import settings
 
 try:
-    from storages.backends.s3boto3 import S3Boto3Storage  # type: ignore[import-untyped]
+    from storages.backends.s3boto3 import S3Boto3Storage
 except ImportError:
     # Fallback for older versions
     try:
-        from storages.backends.s3boto import (
-            S3BotoStorage as S3Boto3Storage,  # type: ignore[import-untyped]
-        )
+        from storages.backends.s3boto import S3BotoStorage as S3Boto3Storage
     except ImportError:
         # Final fallback
         from django.core.files.storage import DefaultStorage as S3Boto3Storage
 
 
-class StaticStorage(S3Boto3Storage):  # type: ignore[misc]
+class StaticStorage(S3Boto3Storage):
     """Custom storage backend for static files using S3."""
 
     location = settings.STATICFILES_LOCATION
@@ -35,7 +33,7 @@ class StaticStorage(S3Boto3Storage):  # type: ignore[misc]
         raise NotImplementedError("This backend doesn't support local file paths.")
 
 
-class MediaStorage(S3Boto3Storage):  # type: ignore[misc]
+class MediaStorage(S3Boto3Storage):
     """Custom storage backend for media files using S3."""
 
     location = settings.MEDIAFILES_LOCATION

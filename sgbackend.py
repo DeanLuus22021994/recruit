@@ -2,11 +2,11 @@
 
 from typing import List, Optional
 
-import sendgrid  # type: ignore[import-untyped]
+import sendgrid
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
-from sendgrid.helpers.mail import Mail  # type: ignore[import-untyped]
+from sendgrid.helpers.mail import Mail
 
 
 class SendGridBackend(BaseEmailBackend):

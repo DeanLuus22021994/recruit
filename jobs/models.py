@@ -1,3 +1,5 @@
+"""Models for the jobs application."""
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -9,13 +11,18 @@ else:
 
 
 class Country(models.Model):
+    """Model representing a country."""
+
     country: models.CharField = models.CharField(max_length=100)
 
     def __str__(self) -> str:
+        """Return string representation of the country."""
         return str(self.country)
 
 
 class Job(models.Model):
+    """Model representing a job posting."""
+
     employer: models.ForeignKey = models.ForeignKey(
         "employers.Employer", on_delete=models.CASCADE, related_name="jobs"
     )
@@ -64,11 +71,14 @@ class Job(models.Model):
     )
 
     def __str__(self) -> str:
+        """Return string representation of the job."""
         employer_name = getattr(self.employer, "name_english", "Unknown")
         return f"{self.pk}) {employer_name}: {self.title}"
 
 
 class JobRequirements(models.Model):
+    """Model representing job requirements."""
+
     job: models.OneToOneField = models.OneToOneField(Job, on_delete=models.CASCADE)
     age_high: models.IntegerField = models.IntegerField()
     age_low: models.IntegerField = models.IntegerField()
@@ -81,5 +91,6 @@ class JobRequirements(models.Model):
     citizenship: models.ManyToManyField = models.ManyToManyField(Country, blank=True)
 
     def __str__(self) -> str:
+        """Return string representation of the job requirements."""
         job_title = getattr(self.job, "title", "Unknown Job")
         return f"Requirements for {job_title}"
