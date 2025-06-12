@@ -17,7 +17,9 @@ class Country(models.Model):
 
 
 class Job(models.Model):
-    """Model representing a job posting."""    employer = models.ForeignKey(
+    """Model representing a job posting."""
+
+    employer = models.ForeignKey(
         "recruit_models.Employer", on_delete=models.CASCADE, related_name="jobs"
     )
     title = models.CharField(max_length=100)
@@ -47,9 +49,8 @@ class Job(models.Model):
         ),
     )
     compensation_amount = models.CharField(max_length=25, blank=False)
-    compensation_terms = models.CharField(max_length=250)
-    is_featured = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)    recruiter = models.ForeignKey(
+    is_active = models.BooleanField(default=True)
+    recruiter = models.ForeignKey(
         "recruit_models.Recruiter", on_delete=models.CASCADE, related_name="jobs"
     )
     last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
