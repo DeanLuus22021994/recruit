@@ -2,13 +2,13 @@
 
 from typing import Any, Optional
 
-from allauth.account.models import EmailAddress  # type: ignore[import-untyped]
+from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
 from django.core import signing
 from django.core.signing import BadSignature, SignatureExpired
 from django.db import models
 from django.db.models.signals import post_save
-from django_countries.fields import CountryField  # type: ignore[import-untyped]
+from django_countries.fields import CountryField
 
 from recruit.choices import TIMEZONE_CHOICES
 
@@ -16,13 +16,15 @@ from recruit.choices import TIMEZONE_CHOICES
 class UserProfile(models.Model):
     """Model for user profiles."""
 
-    user: models.OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE)
-    timezone: models.CharField = models.CharField(
+    user: models.OneToOneField[User, User] = models.OneToOneField(
+        User, on_delete=models.CASCADE
+    )
+    timezone: models.CharField[str, str] = models.CharField(
         choices=TIMEZONE_CHOICES, max_length=50, blank=True
     )
-    citizenship: CountryField = CountryField(blank_label="(Select country)")  # type: ignore[misc]
-    skype_id: models.CharField = models.CharField(max_length=50, blank=True)
-    user_type: models.CharField = models.CharField(
+    citizenship: CountryField = CountryField(blank_label="(Select country)")
+    skype_id: models.CharField[str, str] = models.CharField(max_length=50, blank=True)
+    user_type: models.CharField[str, str] = models.CharField(
         choices=(
             ("Candidate", "Candidate"),
             ("Recruiter", "Recruiter"),
@@ -30,10 +32,10 @@ class UserProfile(models.Model):
         ),
         max_length=50,
     )
-    last_modified: models.DateTimeField = models.DateTimeField(
+    last_modified: models.DateTimeField[Any, Any] = models.DateTimeField(
         auto_now_add=False, auto_now=True
     )
-    created: models.DateTimeField = models.DateTimeField(
+    created: models.DateTimeField[Any, Any] = models.DateTimeField(
         auto_now_add=True, auto_now=False
     )
 
@@ -60,9 +62,9 @@ class UserProfile(models.Model):
         except BadSignature:
             return None
         try:
-            user = User.objects.get(email=value["email"])  # type: ignore[misc]
+            user = User.objects.get(email=value["email"])
             return user
-        except User.DoesNotExist:  # type: ignore[misc]
+        except User.DoesNotExist:
             return None
 
 
@@ -71,9 +73,7 @@ def create_account_emailaddress(
 ) -> None:
     """Create EmailAddress for django-allauth when user is created."""
     if created:
-        EmailAddress.objects.get_or_create(  # type: ignore[misc]
-            user_id=instance.id, email=instance.email
-        )
+        EmailAddress.objects.get_or_create(user_id=instance.pk, email=instance.email)
 
 
 post_save.connect(create_account_emailaddress, sender=User)

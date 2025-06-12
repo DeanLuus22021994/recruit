@@ -2,21 +2,22 @@
 
 import datetime
 import tempfile
+from typing import Any
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 
 
-def get_user(id: int) -> User:
+def get_user(user_id: int) -> User:
     """Get user by ID."""
-    return User.objects.get(id=id)
+    return User.objects.get(id=user_id)
 
 
-def get_candidate(id: int):
+def get_candidate(candidate_id: int) -> Any:
     """Get candidate by ID."""
     from candidates.models import Candidate
 
-    return Candidate.objects.get(id=id)
+    return Candidate.objects.get(id=candidate_id)
 
 
 class UserTestCase(TestCase):
@@ -26,6 +27,7 @@ class UserTestCase(TestCase):
         """Set up test data."""
         user = User.objects.create(
             email="email@example.com",
+            username="email@example.com",  # Django User requires username
             first_name="John",
             last_name="Doe",
         )
@@ -59,7 +61,7 @@ class UserTestCase(TestCase):
             date_of_birth=datetime.date(1970, 1, 1),
         )
         candidate.save()
-        self.assertEqual(candidate.user.id, 1)
+        self.assertEqual(candidate.user.pk, 1)
         self.assertEqual(candidate.user.email, "email@example.com")
         self.assertEqual(candidate.user.first_name, "John")
 
@@ -76,6 +78,11 @@ class UserTestCase(TestCase):
         from employers.models import Employer
 
         user = get_user(1)
+
+        # Create a temporary file for the business license
+        temp_file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+        temp_file.close()
+
         employer = Employer(
             user=user,
             phone_number="+44 20 34545454",
@@ -83,7 +90,10 @@ class UserTestCase(TestCase):
             name_local="Non-english name",
             address_english="123 Long Street",
             address_local="Non-english address",
-            business_license=tempfile.NamedTemporaryFile(suffix=".jpg").name,
+            business_license=temp_file.name,
         )
         employer.save()
-        self.assertEqual(employer, user.employer)
+
+        # Access employer through the related manager
+        user_employer = getattr(user, "employer", None)
+        self.assertEqual(employer, user_employer)

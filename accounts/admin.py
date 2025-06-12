@@ -1,6 +1,6 @@
 """Django admin configuration for accounts app."""
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 from django import forms
 from django.contrib import admin
@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from .models import UserProfile
 
 
-class UserCreationForm(forms.ModelForm):
+class UserCreationForm(forms.ModelForm[User]):
     """Form for creating new users."""
 
     class Meta:
@@ -22,6 +22,9 @@ class UserCreationForm(forms.ModelForm):
     def clean(self) -> Dict[str, Any]:
         """Clean and validate form data."""
         cleaned_data = super().clean()
+        if cleaned_data is None:
+            return {}
+
         email = cleaned_data.get("email")
         if email and User.objects.filter(email=email).exists():
             raise ValidationError("Email already registered")
@@ -37,7 +40,7 @@ class UserCreationForm(forms.ModelForm):
         return user
 
 
-class UserChangeForm(forms.ModelForm):
+class UserChangeForm(forms.ModelForm[User]):
     """Form for updating users."""
 
     password = ReadOnlyPasswordHashField()
@@ -51,7 +54,7 @@ class UserChangeForm(forms.ModelForm):
         return str(self.initial.get("password", ""))
 
 
-class UserProfileInline(admin.StackedInline):
+class UserProfileInline(admin.StackedInline[UserProfile, User]):
     """Inline admin for user profiles."""
 
     model = UserProfile
@@ -59,7 +62,7 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
 
 
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin[User]):
     """Admin interface for User model."""
 
     form = UserChangeForm
