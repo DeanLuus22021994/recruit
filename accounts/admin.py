@@ -1,5 +1,7 @@
 """Django admin configuration for accounts app."""
 
+from typing import Dict, Any
+
 from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -17,18 +19,19 @@ class UserCreationForm(forms.ModelForm):
         model = User
         fields = ("email", "username")
 
-    def clean(self) -> dict:
+    def clean(self) -> Dict[str, Any]:
         """Clean and validate form data."""
-        super(UserCreationForm, self).clean()
-        cleaned_data = self.cleaned_data
-        if User.objects.filter(email=cleaned_data["email"]).exists():  # type: ignore[misc]
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+        if email and User.objects.filter(email=email).exists():
             raise ValidationError("Email already registered")
         return cleaned_data
 
     def save(self, commit: bool = True) -> User:
         """Save the user instance."""
-        user = super(UserCreationForm, self).save(commit=False)
-        user.username = self.cleaned_data["email"]
+        user = super().save(commit=False)
+        if self.cleaned_data.get("email"):
+            user.username = self.cleaned_data["email"]
         if commit:
             user.save()
         return user
@@ -45,10 +48,10 @@ class UserChangeForm(forms.ModelForm):
 
     def clean_password(self) -> str:
         """Return the initial password."""
-        return str(self.initial["password"])
+        return str(self.initial.get("password", ""))
 
 
-class UserProfileInline(admin.StackedInline):  # type: ignore[type-arg]
+class UserProfileInline(admin.StackedInline):
     """Inline admin for user profiles."""
 
     model = UserProfile
@@ -56,7 +59,7 @@ class UserProfileInline(admin.StackedInline):  # type: ignore[type-arg]
     can_delete = False
 
 
-class UserAdmin(BaseUserAdmin):  # type: ignore[type-arg]
+class UserAdmin(BaseUserAdmin):
     """Admin interface for User model."""
 
     form = UserChangeForm

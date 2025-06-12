@@ -1,9 +1,10 @@
 """Views for the jobs application."""
 
-from typing import Any, List, Optional, Union
+from typing import Any, List, Union
 
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,12 +21,12 @@ def add_interview_requests(
 ) -> None:
     """Add interview requests for the given user and job IDs."""
     try:
-        candidate = user.candidate
+        candidate = Candidate.objects.get(user=user)
     except Candidate.DoesNotExist:
         messages.add_message(request, messages.ERROR, "This user is not a candidate.")
         return
-    except Exception as e:
-        messages.add_message(request, messages.ERROR, f"An error occurred: {str(e)}")
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, "Candidate not found.")
         return
 
     for job_id in jobs_ids:
@@ -42,7 +43,7 @@ def add_interview_requests(
 def view_jobs(request: HttpRequest) -> Union[HttpResponseRedirect, HttpResponse]:
     """Display jobs and handle job application requests."""
     key = request.GET.get("key", None)
-    user: Optional[User] = UserProfile.verify_token(key)
+    user = UserProfile.verify_token(key)
     context: dict[str, Any] = {}
 
     if request.method == "GET":
@@ -58,10 +59,10 @@ def view_jobs(request: HttpRequest) -> Union[HttpResponseRedirect, HttpResponse]
             request.session["redirect_to"] = reverse("jobs")
             return HttpResponseRedirect(reverse("account_login"))
 
-        if not user:
+        if not user and not request.user.is_anonymous:
             user = request.user
 
-        if user:
+        if user and isinstance(user, User):
             add_interview_requests(request, user, jobs_ids)
 
     return render(request, "jobs/jobs.html", context)
