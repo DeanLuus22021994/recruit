@@ -1,3 +1,5 @@
+"""Utility functions for file processing and S3 operations."""
+
 import mimetypes
 from io import BytesIO
 from typing import Any, List
@@ -7,6 +9,7 @@ from PIL import Image
 
 
 def generate_thumbnail(file: Any) -> SimpleUploadedFile:
+    """Generate a thumbnail from an uploaded image file."""
     size = (100, 100)
     im = Image.open(file)
     filename = file.name.split("/")[-1].split(".")[0]
@@ -25,6 +28,7 @@ def generate_thumbnail(file: Any) -> SimpleUploadedFile:
 
 
 def delete_from_s3(instances_list: List[Any]) -> List[Any]:
+    """Delete files from S3 storage for given instances."""
     for instance in instances_list:
         if hasattr(instance, "storage") and hasattr(instance, "name"):
             instance.storage.delete(name=instance.name)

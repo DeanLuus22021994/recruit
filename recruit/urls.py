@@ -33,8 +33,12 @@ urlpatterns: List[URLPattern] = [
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),
     path("jobs/", jobsViews.view_jobs, name="jobs"),  # type: ignore[misc]
-    re_path(r"^jobs/(?P<job_id>\d+)/$", jobsViews.view_job_details, name="job_details"),  # type: ignore[misc]
-    path("candidates/apply/", candidatesViews.apply, name="candidate_apply"),  # type: ignore[misc]
+    re_path(
+        r"^jobs/(?P<job_id>\d+)/$", jobsViews.view_job_details, name="job_details"
+    ),  # type: ignore[misc]
+    path(
+        "candidates/apply/", candidatesViews.apply, name="candidate_apply"
+    ),  # type: ignore[misc]
     path(
         "candidates/apply/success/",
         candidatesViews.apply_success,  # type: ignore[misc]
@@ -47,16 +51,22 @@ urlpatterns: List[URLPattern] = [
         {"document_root": settings.MEDIA_ROOT, "show_indexes": settings.DEBUG},
     ),
     re_path(
-        r"^available/(?P<bu_id>\d+)/$", interviewsViews.available, name="available"  # type: ignore[misc]
-    ),
+        r"^available/(?P<bu_id>\d+)/$", interviewsViews.available, name="available"
+    ),  # type: ignore[misc]
     re_path(
         r"^availability/(?P<bu_id>\d+)/$",
         interviewsViews.availability,  # type: ignore[misc]
         name="availability",
     ),
-    path("interviews/", interviewsViews.interview_requests, name="interviews"),  # type: ignore[misc]
+    path(
+        "interviews/", interviewsViews.interview_requests, name="interviews"
+    ),  # type: ignore[misc]
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # type: ignore[misc]
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore[misc]
+    urlpatterns += static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+    )  # type: ignore[misc]
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )  # type: ignore[misc]

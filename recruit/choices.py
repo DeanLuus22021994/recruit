@@ -1,5 +1,4 @@
-# Choices used for M2M tables are actually not used in
-# varChar fields. They must be manually inserted into db.
+"""Choices and constants used throughout the application."""
 
 import pytz  # type: ignore[import-untyped]
 from django_countries import countries

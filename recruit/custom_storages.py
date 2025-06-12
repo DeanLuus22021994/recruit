@@ -1,3 +1,5 @@
+"""Custom storage backends for static and media files using Amazon S3."""
+
 from typing import Any
 
 from django.conf import settings
@@ -16,26 +18,36 @@ except ImportError:
 
 
 class StaticStorage(S3Boto3Storage):  # type: ignore[misc]
+    """Custom storage backend for static files using S3."""
+
     location = settings.STATICFILES_LOCATION
 
     def get_accessed_time(self, name: str) -> Any:
+        """Raise NotImplementedError as this backend doesn't support accessed time."""
         raise NotImplementedError("This backend doesn't support accessed time.")
 
     def get_created_time(self, name: str) -> Any:
+        """Raise NotImplementedError as this backend doesn't support created time."""
         raise NotImplementedError("This backend doesn't support created time.")
 
     def path(self, name: str) -> str:
+        """Raise NotImplementedError as this backend doesn't support local paths."""
         raise NotImplementedError("This backend doesn't support local file paths.")
 
 
 class MediaStorage(S3Boto3Storage):  # type: ignore[misc]
+    """Custom storage backend for media files using S3."""
+
     location = settings.MEDIAFILES_LOCATION
 
     def get_accessed_time(self, name: str) -> Any:
+        """Raise NotImplementedError as this backend doesn't support accessed time."""
         raise NotImplementedError("This backend doesn't support accessed time.")
 
     def get_created_time(self, name: str) -> Any:
+        """Raise NotImplementedError as this backend doesn't support created time."""
         raise NotImplementedError("This backend doesn't support created time.")
 
     def path(self, name: str) -> str:
+        """Raise NotImplementedError as this backend doesn't support local paths."""
         raise NotImplementedError("This backend doesn't support local file paths.")
