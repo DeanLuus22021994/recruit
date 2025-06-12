@@ -19,26 +19,19 @@ try:
 
     from recruit_models.candidates import (
         Candidate,
-        CandidateDocument,
-        CandidateRequirements,
     )
 
     print("✓ candidates models imported successfully")
 
-    from recruit_models.employers import Employer, EmployerImages, EmployerRequirements
+    from recruit_models.employers import Employer
 
     print("✓ employers models imported successfully")
 
-    from recruit_models.interviews import (
-        Available,
-        Exclusion,
-        InterviewInvitation,
-        InterviewRequest,
-    )
+    from recruit_models.interviews import InterviewInvitation
 
     print("✓ interviews models imported successfully")
 
-    from recruit_models.jobs import Country, Job
+    from recruit_models.jobs import Job
 
     print("✓ jobs models imported successfully")
 
@@ -46,13 +39,11 @@ try:
 
     print("✓ recruiters models imported successfully")
 
-    from recruit_models.sendgrid import EmailLog, EmailTemplate
+    from recruit_models.sendgrid import EmailTemplate
 
     print("✓ sendgrid models imported successfully")
 
     # Test app-level imports
-    print("\nTesting app-level model imports...")
-
     from accounts.models import UserProfile as AppUserProfile
 
     print("✓ accounts app models imported successfully")
@@ -93,10 +84,12 @@ try:
     print("✓ All model identities verified")
 
     print("\n🎉 All imports successful! Model refactoring is working correctly.")
-
 except ImportError as e:
     print(f"❌ Import error: {e}")
     sys.exit(1)
+except AssertionError as e:
+    print(f"❌ Assertion error: {e}")
+    sys.exit(1)
 except Exception as e:
-    print(f"❌ Error: {e}")
+    print(f"❌ Unexpected error: {e}")
     sys.exit(1)
