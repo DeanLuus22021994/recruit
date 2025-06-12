@@ -27,7 +27,7 @@ class Recruiter(models.Model):
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
-        app_label = 'recruiters'
+        app_label = "recruiters"
 
     def __str__(self) -> str:
         """Return string representation of the recruiter."""

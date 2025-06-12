@@ -1,5 +1,6 @@
 """Models for the accounts application."""
 
+from types.accounts import TokenVerificationResult, UserProfileType
 from typing import Any, Optional
 
 from django.contrib.auth.models import User
@@ -22,17 +23,13 @@ except ImportError:
 
 
 class UserProfile(models.Model):
-    """Model for user profiles."""
+    """Model for user profiles implementing UserProfileType."""
 
-    user: models.OneToOneField[User, User] = models.OneToOneField(
-        User, on_delete=models.CASCADE
-    )
-    timezone: models.CharField[str, str] = models.CharField(
-        choices=TIMEZONE_CHOICES, max_length=50, blank=True
-    )
-    citizenship: CountryField = CountryField(blank_label="(Select country)")
-    skype_id: models.CharField[str, str] = models.CharField(max_length=50, blank=True)
-    user_type: models.CharField[str, str] = models.CharField(
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = models.CharField(choices=TIMEZONE_CHOICES, max_length=50, blank=True)
+    citizenship = CountryField(blank_label="(Select country)")
+    skype_id = models.CharField(max_length=50, blank=True)
+    user_type = models.CharField(
         choices=(
             ("Candidate", "Candidate"),
             ("Recruiter", "Recruiter"),
@@ -40,25 +37,19 @@ class UserProfile(models.Model):
         ),
         max_length=50,
     )
-    last_modified: models.DateTimeField[Any, Any] = models.DateTimeField(
-        auto_now_add=False, auto_now=True
-    )
-    created: models.DateTimeField[Any, Any] = models.DateTimeField(
-        auto_now_add=True, auto_now=False
-    )
+    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
-        app_label = 'accounts'
+        app_label = "accounts"
 
     def __str__(self) -> str:
         """Return string representation of the user profile."""
-        user_obj: User = self.user
-        return str(getattr(user_obj, "email", ""))
+        return str(getattr(self.user, "email", ""))
 
     def generate_token(self) -> str:
         """Generate a token for the user."""
-        user_obj: User = self.user
-        email = getattr(user_obj, "email", "")
+        email = getattr(self.user, "email", "")
         token = signing.dumps({"email": email})
         return token
 
@@ -77,8 +68,29 @@ class UserProfile(models.Model):
         try:
             user = User.objects.get(email=value["email"])
             return user
-        except User.DoesNotExist:  # type: ignore[attr-defined]
+        except User.DoesNotExist:
             return None
+
+    @staticmethod
+    def verify_token_with_result(
+        token: Optional[str], max_age: int = 604800
+    ) -> TokenVerificationResult:
+        """Verify a token and return a TokenVerificationResult."""
+        if not token:
+            return TokenVerificationResult(error="No token provided")
+
+        try:
+            value = signing.loads(token, max_age=max_age)
+        except SignatureExpired:
+            return TokenVerificationResult(error="Token expired")
+        except BadSignature:
+            return TokenVerificationResult(error="Invalid token signature")
+
+        try:
+            user = User.objects.get(email=value["email"])
+            return TokenVerificationResult(user=user)
+        except User.DoesNotExist:
+            return TokenVerificationResult(error="User not found")
 
 
 def create_account_emailaddress(
@@ -98,3 +110,6 @@ def create_account_emailaddress(
 # Only connect signal if EmailAddress is available
 if ALLAUTH_AVAILABLE and EmailAddress is not None:
     post_save.connect(create_account_emailaddress, sender=User)
+
+# Type checking
+assert issubclass(UserProfile, UserProfileType)

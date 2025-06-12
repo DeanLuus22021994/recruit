@@ -2,7 +2,7 @@
 
 from typing import Any
 
-import shortuuid  # type: ignore[import-untyped]
+import shortuuid
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -27,7 +27,7 @@ class InterviewInvitation(models.Model):
     uuid = models.CharField(
         primary_key=True,
         max_length=5,
-        default=shortuuid.ShortUUID().random(length=5).upper(),  # type: ignore[misc]
+        default=shortuuid.ShortUUID().random(length=5).upper(),
     )
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
@@ -41,12 +41,12 @@ class InterviewInvitation(models.Model):
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
-        app_label = 'interviews'
+        app_label = "interviews"
 
     def __str__(self) -> str:
         """Return string representation of the interview invitation."""
-        candidate_email = getattr(self.candidate.user, 'email', 'Unknown')
-        job_title = getattr(self.job, 'title', 'Unknown Job')
+        candidate_email = getattr(self.candidate.user, "email", "Unknown")
+        job_title = getattr(self.job, "title", "Unknown Job")
         return f"<Interview C: {candidate_email} B: {job_title}>"
 
 
@@ -65,13 +65,18 @@ class InterviewRequest(models.Model):
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
-        app_label = 'interviews'
+        app_label = "interviews"
 
 
 def generate_invitation(
     sender: Any, instance: InterviewRequest, created: bool, **kwargs: Any
 ) -> None:
     """Generate interview invitation when both parties accept."""
+    # Mark unused parameters
+    _ = sender
+    _ = created
+    _ = kwargs
+
     if instance.candidate_accepted and instance.employer_accepted:
         InterviewInvitation.objects.create(
             candidate=instance.candidate, job=instance.job
@@ -92,7 +97,7 @@ class Available(models.Model):
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     class Meta:
-        app_label = 'interviews'
+        app_label = "interviews"
 
     def __str__(self) -> str:
         """Return string representation of availability."""
@@ -106,4 +111,4 @@ class Exclusion(models.Model):
     date = models.DateField()
 
     class Meta:
-        app_label = 'interviews'
+        app_label = "interviews"

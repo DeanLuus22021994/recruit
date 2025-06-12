@@ -1,37 +1,53 @@
 """Models package for the recruit application."""
 
 # Import all models to make them available at package level
-from .accounts import UserProfile
-from .candidates import Candidate, CandidateRequirements, CandidateDocument
-from .employers import Employer, EmployerRequirements, EmployerImages
-from .interviews import InterviewInvitation, InterviewRequest, Available, Exclusion
+from .accounts import UserProfile, create_account_emailaddress
+from .candidates import Candidate, CandidateDocument, CandidateRequirements
+from .candidates import update_user_profile as candidate_update_user_profile
+from .employers import Employer, EmployerImages, EmployerRequirements
+from .employers import update_user_profile as employer_update_user_profile
+from .interviews import (
+    STATUS_CHOICES,
+    Available,
+    Exclusion,
+    InterviewInvitation,
+    InterviewRequest,
+    generate_invitation,
+)
 from .jobs import Country, Job, JobRequirements
 from .recruiters import Recruiter
-from .sendgrid import EmailTemplate, EmailLog
+from .recruiters import update_user_profile as recruiter_update_user_profile
+from .sendgrid import EmailLog, EmailTemplate
 
 __all__ = [
     # Accounts models
-    'UserProfile',
+    "UserProfile",
+    "create_account_emailaddress",
     # Candidates models
-    'Candidate',
-    'CandidateRequirements',
-    'CandidateDocument',
+    "Candidate",
+    "CandidateRequirements",
+    "CandidateDocument",
+    "candidate_update_user_profile",
     # Employers models
-    'Employer',
-    'EmployerRequirements',
-    'EmployerImages',
+    "Employer",
+    "EmployerRequirements",
+    "EmployerImages",
+    "employer_update_user_profile",
     # Interviews models
-    'InterviewInvitation',
-    'InterviewRequest',
-    'Available',
-    'Exclusion',
+    "InterviewInvitation",
+    "InterviewRequest",
+    "Available",
+    "Exclusion",
+    "generate_invitation",
+    "STATUS_CHOICES",
     # Jobs models
-    'Country',
-    'Job',
-    'JobRequirements',
+    "Country",
+    "Job",
+    "JobRequirements",
     # Recruiters models
-    'Recruiter',
+    "Recruiter",
+    "recruiter_update_user_profile",
     # SendGrid models
-    'EmailTemplate',
-    'EmailLog',
+    "EmailTemplate",
+    "EmailLog",
 ]
