@@ -5,5 +5,12 @@
 	"workspaceFolder": "/workspace",
 	"forwardPorts": [
 		8000
-	]
+	],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.pythonPath": "/usr/local/bin/python"
+			}
+		}
+	}
 }
