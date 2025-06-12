@@ -1,6 +1,5 @@
 """Models for the accounts application."""
 
-from types.accounts import TokenVerificationResult
 from typing import Any, Optional
 
 from django.contrib.auth.models import User
@@ -11,6 +10,7 @@ from django.db.models.signals import post_save
 from django_countries.fields import CountryField
 
 from recruit.choices import TIMEZONE_CHOICES
+from recruit_types.accounts import TokenVerificationResult
 
 try:
     from allauth.account.models import EmailAddress
