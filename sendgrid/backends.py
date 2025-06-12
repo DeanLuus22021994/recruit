@@ -77,29 +77,26 @@ class SendGridBackend(BaseEmailBackend):
             logger.error("SendGrid credentials not configured properly.")
             if not self.fail_silently:
                 raise ValueError("SendGrid API key or username/password required")
-            return 0
-
-        # Initialize SendGrid client
+            return 0        # Initialize SendGrid client
         try:
             if SENDGRID_AVAILABLE:
                 sg = sendgrid.SendGridAPIClient(api_key=self.api_key)
             else:
                 return 0
         except Exception as e:
-            logger.error(f"Failed to initialize SendGrid client: {e}")
+            logger.error("Failed to initialize SendGrid client: %s", e)
             if not self.fail_silently:
                 raise
             return 0
 
         num_sent = 0
-        
-        for message in email_messages:
+          for message in email_messages:
             try:
                 sent = self._send_single_message(sg, message)
                 if sent:
                     num_sent += 1
             except Exception as e:
-                logger.error(f"Failed to send email to {message.to}: {e}")
+                logger.error("Failed to send email to %s: %s", message.to, e)
                 if not self.fail_silently:
                     raise
 
@@ -149,17 +146,16 @@ class SendGridBackend(BaseEmailBackend):
             
             # Send the email
             response = sg_client.send(mail)
-            
-            # Check response status
+              # Check response status
             if response.status_code in [200, 201, 202]:
-                logger.info(f"Email sent successfully to {message.to}")
+                logger.info("Email sent successfully to %s", message.to)
                 return True
             else:
-                logger.warning(f"SendGrid returned status {response.status_code}: {response.body}")
+                logger.warning("SendGrid returned status %s: %s", response.status_code, response.body)
                 return False
                 
         except Exception as e:
-            logger.error(f"Error sending email: {e}")
+            logger.error("Error sending email: %s", e)
             raise
 
     def _prepare_recipients(self, recipients: Union[List[str], str]) -> List[str]:
@@ -207,8 +203,7 @@ class SendGridBackend(BaseEmailBackend):
                         disposition='attachment'
                     )
                     mail.add_attachment(attached_file)
-                    
-        except ImportError:
+                      except ImportError:
             logger.warning("SendGrid attachment support not available")
         except Exception as e:
-            logger.error(f"Error adding attachments: {e}")
+            logger.error("Error adding attachments: %s", e)
