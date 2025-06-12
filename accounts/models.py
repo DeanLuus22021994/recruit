@@ -2,7 +2,6 @@
 
 from typing import Any, Optional
 
-from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
 from django.core import signing
 from django.core.signing import BadSignature, SignatureExpired
@@ -12,19 +11,21 @@ from django_countries.fields import CountryField
 
 from recruit.choices import TIMEZONE_CHOICES
 
+try:
+    from allauth.account.models import EmailAddress
+except ImportError:
+    # Fallback for when allauth is not available
+    EmailAddress = None  # type: ignore
+
 
 class UserProfile(models.Model):
     """Model for user profiles."""
 
-    user: models.OneToOneField[User, User] = models.OneToOneField(
-        User, on_delete=models.CASCADE
-    )
-    timezone: models.CharField[str, str] = models.CharField(
-        choices=TIMEZONE_CHOICES, max_length=50, blank=True
-    )
-    citizenship: CountryField = CountryField(blank_label="(Select country)")
-    skype_id: models.CharField[str, str] = models.CharField(max_length=50, blank=True)
-    user_type: models.CharField[str, str] = models.CharField(
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = models.CharField(choices=TIMEZONE_CHOICES, max_length=50, blank=True)
+    citizenship = CountryField(blank_label="(Select country)")
+    skype_id = models.CharField(max_length=50, blank=True)
+    user_type = models.CharField(
         choices=(
             ("Candidate", "Candidate"),
             ("Recruiter", "Recruiter"),
@@ -32,20 +33,16 @@ class UserProfile(models.Model):
         ),
         max_length=50,
     )
-    last_modified: models.DateTimeField[Any, Any] = models.DateTimeField(
-        auto_now_add=False, auto_now=True
-    )
-    created: models.DateTimeField[Any, Any] = models.DateTimeField(
-        auto_now_add=True, auto_now=False
-    )
+    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     def __str__(self) -> str:
         """Return string representation of the user profile."""
-        return str(self.user.email)
+        return str(getattr(self.user, "email", ""))
 
     def generate_token(self) -> str:
         """Generate a token for the user."""
-        email = self.user.email
+        email = getattr(self.user, "email", "")
         token = signing.dumps({"email": email})
         return token
 
@@ -72,8 +69,15 @@ def create_account_emailaddress(
     sender: Any, instance: User, created: bool, **kwargs: Any
 ) -> None:
     """Create EmailAddress for django-allauth when user is created."""
-    if created:
-        EmailAddress.objects.get_or_create(user_id=instance.pk, email=instance.email)
+    _ = sender  # Mark as used
+    _ = kwargs  # Mark as used
+
+    if created and EmailAddress is not None:
+        email = getattr(instance, "email", "")
+        if email:
+            EmailAddress.objects.get_or_create(user_id=instance.pk, email=email)
 
 
-post_save.connect(create_account_emailaddress, sender=User)
+# Only connect signal if EmailAddress is available
+if EmailAddress is not None:
+    post_save.connect(create_account_emailaddress, sender=User)
