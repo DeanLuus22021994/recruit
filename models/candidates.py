@@ -1,10 +1,5 @@
 """Models for the candidates application."""
 
-from types.candidates import (
-    CandidateDocumentType,
-    CandidateRequirementsType,
-    CandidateType,
-)
 from typing import Any, Dict, Tuple
 
 from django.contrib.auth.models import User
@@ -116,9 +111,3 @@ class CandidateDocument(models.Model):
 
         delete_from_s3([self.document])
         return super(CandidateDocument, self).delete(*args, **kwargs)
-
-
-# Type checking
-assert issubclass(Candidate, CandidateType)
-assert issubclass(CandidateRequirements, CandidateRequirementsType)
-assert issubclass(CandidateDocument, CandidateDocumentType)

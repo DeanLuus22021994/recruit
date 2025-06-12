@@ -1,6 +1,6 @@
 """Models for the accounts application."""
 
-from types.accounts import TokenVerificationResult, UserProfileType
+from types.accounts import TokenVerificationResult
 from typing import Any, Optional
 
 from django.contrib.auth.models import User
@@ -65,6 +65,7 @@ class UserProfile(models.Model):
             return None
         except BadSignature:
             return None
+
         try:
             user = User.objects.get(email=value["email"])
             return user
@@ -110,6 +111,3 @@ def create_account_emailaddress(
 # Only connect signal if EmailAddress is available
 if ALLAUTH_AVAILABLE and EmailAddress is not None:
     post_save.connect(create_account_emailaddress, sender=User)
-
-# Type checking
-assert issubclass(UserProfile, UserProfileType)

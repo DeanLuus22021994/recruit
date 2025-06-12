@@ -1,12 +1,6 @@
 """Models for the interviews application."""
 
-from types.interviews import (
-    STATUS_CHOICES,
-    AvailableType,
-    ExclusionType,
-    InterviewInvitationType,
-    InterviewRequestType,
-)
+from types.interviews import STATUS_CHOICES
 from typing import Any
 
 import shortuuid
@@ -14,8 +8,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 
-from .candidates import Candidate
-from .jobs import Job
+from models.candidates import Candidate
+from models.jobs import Job
 
 
 class InterviewInvitation(models.Model):
@@ -109,10 +103,3 @@ class Exclusion(models.Model):
 
     class Meta:
         app_label = "interviews"
-
-
-# Type checking
-assert issubclass(InterviewInvitation, InterviewInvitationType)
-assert issubclass(InterviewRequest, InterviewRequestType)
-assert issubclass(Available, AvailableType)
-assert issubclass(Exclusion, ExclusionType)

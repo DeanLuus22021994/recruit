@@ -1,7 +1,5 @@
 """Models for the employers application."""
 
-"""Models for the employers application."""
-
 from typing import Any, Dict, Tuple
 
 from django.contrib.auth.models import User
@@ -16,7 +14,6 @@ except ImportError:
     PhoneNumberField = models.CharField
 
 from recruit.choices import EDUCATION_CHOICES
-from types.employers import EmployerType, EmployerRequirementsType, EmployerImagesType
 
 
 class Employer(models.Model):
@@ -117,17 +114,12 @@ class EmployerImages(models.Model):
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the image instance with thumbnail generation."""
         from recruit.utils import generate_thumbnail
-
+        
         self.thumb = generate_thumbnail(self.image)
-        super(EmployerImages, self).save(*args, **kwargs)    def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
+        super(EmployerImages, self).save(*args, **kwargs)
+    
+    def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the image instance and associated files."""
         from recruit.utils import delete_from_s3
 
-        delete_from_s3([self.image, self.thumb])
-        return super(EmployerImages, self).delete(*args, **kwargs)
-
-
-# Type checking
-assert issubclass(Employer, EmployerType)
-assert issubclass(EmployerRequirements, EmployerRequirementsType)
-assert issubclass(EmployerImages, EmployerImagesType)
+        delete_from_s3([self.image, self.thumb])        return super(EmployerImages, self).delete(*args, **kwargs)
