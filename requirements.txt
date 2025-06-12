@@ -21,8 +21,8 @@ oauth2==1.9.0.post1
 
 # Django extensions and utilities
 django-extensions==4.1
-django-autofixture==0.12.1
-django-bootstrap3==24.2
+model-bakery==1.20.5  # Modern replacement for django-autofixture
+django-bootstrap3==25.1
 django-countries==7.6.1
 django-localflavor==4.0
 django-phonenumber-field==8.0.0
@@ -43,7 +43,7 @@ requests==2.32.3
 
 # Email services
 sendgrid==6.11.0
-sendgrid-django==2.2.0
+sendgrid-django==4.2.0
 
 # Utility libraries
 python-dateutil==2.9.0.post0
