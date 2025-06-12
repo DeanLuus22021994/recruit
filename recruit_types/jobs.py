@@ -46,4 +46,4 @@ class JobRequirementsType(Protocol):
     age_high: int
     age_low: int
     gender: str
-    citizenship: models.ManyToManyField
+    citizenship: models.ManyToManyField[Any, Any]
