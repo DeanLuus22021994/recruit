@@ -1,22 +1,34 @@
+# Use Python 3.8 slim image for smaller footprint
 FROM python:3.8-slim
 
+# Set environment variables for optimal Python behavior
 ENV DEBIAN_FRONTEND=noninteractive \
   PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \
   LANG=C.UTF-8 \
   LC_ALL=C.UTF-8
 
-# Install build tools and Pillow dependencies, then clean up
+# Install system dependencies in a single layer for efficiency
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
   build-essential \
   libjpeg-dev \
   zlib1g-dev \
   libfreetype6-dev \
-  && rm -rf /var/lib/apt/lists/*
+  git \
+  && rm -rf /var/lib/apt/lists/* \
+  && apt-get clean
 
-COPY requirements.txt /requirements.txt
-RUN pip install --upgrade pip==20.3.4 setuptools==44.1.1 wheel==0.36.2 \
-  && pip install --no-cache-dir -r /requirements.txt
+# Copy requirements and install Python packages
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --upgrade pip setuptools wheel \
+  && pip install --no-cache-dir -r /tmp/requirements.txt \
+  && rm /tmp/requirements.txt
 
+# Set working directory
 WORKDIR /workspace
+
+# Create non-root user for security
+RUN useradd --create-home --shell /bin/bash vscode \
+  && chown -R vscode:vscode /workspace
+USER vscode
