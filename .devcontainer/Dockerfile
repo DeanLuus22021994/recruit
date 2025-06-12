@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/python:1-3.8-bullseye
+FROM python:3.8-slim
 
 
 # Install only essential build tools
