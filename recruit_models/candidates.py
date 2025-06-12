@@ -63,7 +63,8 @@ class Candidate(models.Model):
 
 def update_user_profile(
     sender: Any, instance: Candidate, created: bool, **kwargs: Any
-) -> None:    """Update user profile when candidate is created."""
+) -> None:
+    """Update user profile when candidate is created."""
     from recruit_models.accounts import UserProfile
 
     # Mark unused parameters

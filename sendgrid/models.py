@@ -1,1 +1,6 @@
-"""SendGrid models for tracking email statistics and templates."""# Import models from centralized locationfrom models.sendgrid import EmailTemplate, EmailLog__all__ = ['EmailTemplate', 'EmailLog']
+"""SendGrid models for tracking email statistics and templates."""
+
+# Import models from centralized location
+from recruit_models.sendgrid import EmailLog, EmailTemplate
+
+__all__ = ["EmailTemplate", "EmailLog"]
