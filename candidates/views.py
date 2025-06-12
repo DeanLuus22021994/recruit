@@ -20,7 +20,6 @@ def apply(request: HttpRequest) -> HttpResponse:
     user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
 
     if not key and request.method == "POST":
-
         form = UserApplyStep1Form(request.POST)
 
         if form.is_valid():
@@ -33,13 +32,15 @@ def apply(request: HttpRequest) -> HttpResponse:
             timezone = data["timezone"]
 
             user, created = User.objects.get_or_create(  # type: ignore[misc]
-                first_name=first_name, last_name=last_name, email=email, username=email
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                username=email,
             )
 
             if not created:
-                messages.add_message(
-                    request, messages.ERROR, email + " has already been registered."
-                )
+                error_msg = f"{email} has already been registered."
+                messages.add_message(request, messages.ERROR, error_msg)
             else:
                 userprofile = UserProfile(
                     user=user,
@@ -53,13 +54,13 @@ def apply(request: HttpRequest) -> HttpResponse:
 
                 key = user.userprofile.generate_token()  # type: ignore[misc]
 
-                return HttpResponseRedirect(reverse("candidate_apply") + "?key=" + key)
+                redirect_url = reverse("candidate_apply") + "?key=" + key
+                return HttpResponseRedirect(redirect_url)
 
     elif not key and request.method == "GET":
         form = UserApplyStep1Form()
 
     elif key and user and request.method == "POST":
-
         form = UserApplyStep2Form(request.POST, request.FILES)
 
         if form.is_valid():
@@ -84,27 +85,27 @@ def apply(request: HttpRequest) -> HttpResponse:
                     image=files["image"],
                 )
             CandidateDocument.objects.create(  # type: ignore[misc]
-                candidate=candidate, document=files["resume"], document_type="Resume"
+                candidate=candidate,
+                document=files["resume"],
+                document_type="Resume",
             )
 
             messages.add_message(
                 request, messages.SUCCESS, "Form submitted successfully."
             )
 
-            return HttpResponseRedirect(
-                reverse("candidate_apply_success") + "?key=" + key
-            )
+            success_url = reverse("candidate_apply_success") + "?key=" + key
+            return HttpResponseRedirect(success_url)
 
     elif key and user and request.method == "GET":
         form = UserApplyStep2Form()
 
     else:
-        messages.add_message(
-            request,
-            messages.ERROR,
+        error_message = (
             "A valid application key is required to submit documents. "
-            + "Please contact the administrator.",
+            "Please contact the administrator."
         )
+        messages.add_message(request, messages.ERROR, error_message)
         form = None
 
     return render(request, "candidates/apply.html", {"form": form})
@@ -119,11 +120,8 @@ def apply_success(request: HttpRequest) -> HttpResponse:
     availability_url = None
 
     if not key or not user:
-        messages.add_message(
-            request,
-            messages.ERROR,
-            "A valid application key is required to view this page.",
-        )
+        error_message = "A valid application key is required to view this page."
+        messages.add_message(request, messages.ERROR, error_message)
     else:
         jobs_url = reverse("jobs") + "?key=" + key
         availability_url = reverse("available", args=[user.id]) + "?key=" + key

@@ -1,3 +1,5 @@
+"""Views for the jobs application."""
+
 from typing import Any, List, Optional, Union
 
 from django.contrib import messages
@@ -16,8 +18,9 @@ from .models import Job
 def add_interview_requests(
     request: HttpRequest, user: User, jobs_ids: List[str]
 ) -> None:
+    """Add interview requests for the given user and job IDs."""
     try:
-        candidate = user.candidate  # type: ignore[attr-defined]
+        candidate = user.candidate  # type: ignore[misc]
     except Candidate.DoesNotExist:  # type: ignore[misc]
         messages.add_message(request, messages.ERROR, "This user is not a candidate.")
         return
@@ -36,6 +39,7 @@ def add_interview_requests(
 
 
 def view_jobs(request: HttpRequest) -> Union[HttpResponseRedirect, HttpResponse]:
+    """Display jobs and handle job application requests."""
     key = request.GET.get("key", None)
     user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
     context: dict[str, Any] = {}
@@ -63,6 +67,7 @@ def view_jobs(request: HttpRequest) -> Union[HttpResponseRedirect, HttpResponse]
 
 
 def view_job_details(request: HttpRequest, job_id: str) -> HttpResponse:
+    """Display details for a specific job."""
     job = Job.objects.get(id=job_id)  # type: ignore[misc]
     context = {"job": job}
     return render(request, "jobs/details.html", context)
