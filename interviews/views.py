@@ -14,17 +14,17 @@ from interviews.models import Available, InterviewRequest
 
 def available(request: HttpRequest, bu_id: str) -> HttpResponse:
     """Display user availability page."""
-    user = User.objects.get(id=bu_id)  # type: ignore[misc]
+    user = User.objects.get(id=bu_id)
     context = {"user": user}
     return render(request, "interviews/available.html", context)
 
 
 def availability(request: HttpRequest, bu_id: str) -> JsonResponse:
     """Handle user availability GET/POST requests."""
-    user = User.objects.get(id=bu_id)  # type: ignore[misc]
+    user = User.objects.get(id=bu_id)
 
     if request.method == "GET":
-        user_availability = user.available_set.all()  # type: ignore[misc]
+        user_availability = user.available_set.all()
         availability = []
         for avail in user_availability:
             temp = {
@@ -37,7 +37,7 @@ def availability(request: HttpRequest, bu_id: str) -> JsonResponse:
         return JsonResponse({"availability": availability_json})
 
     if request.method == "POST":
-        old_availability = user.available_set.all()  # type: ignore[misc]
+        old_availability = user.available_set.all()
         new_availability = json.loads(request.POST.get("availability", "[]"))
         timezone = json.loads(request.POST.get("timezone", '""'))
         available_instances = []
@@ -50,12 +50,16 @@ def availability(request: HttpRequest, bu_id: str) -> JsonResponse:
             )
             available_instances.append(avail)
         old_availability.delete()
-        Available.objects.bulk_create(available_instances)  # type: ignore[misc]
+        Available.objects.bulk_create(available_instances)
         message: Dict[str, str] = {"message": "Availability updated"}
-        if timezone != user.userprofile.timezone:  # type: ignore[misc]
-            user.userprofile.timezone = timezone  # type: ignore[misc]
-            user.userprofile.save()  # type: ignore[misc]
-            message["message"] = "Timezone and " + message["message"]
+        
+        # Safe access to userprofile
+        if hasattr(user, 'userprofile') and user.userprofile:
+            if timezone != user.userprofile.timezone:
+                user.userprofile.timezone = timezone
+                user.userprofile.save()
+                message["message"] = "Timezone and " + message["message"]
+        
         return JsonResponse(message)
 
     return JsonResponse({"error": "Invalid request method"})
@@ -65,22 +69,26 @@ def availability(request: HttpRequest, bu_id: str) -> JsonResponse:
 def interview_requests(request: HttpRequest) -> HttpResponse:
     """Display interview requests based on user type."""
     user = request.user
-    user_type = user.userprofile.user_type  # type: ignore[misc]
+    
+    # Safe access to user attributes
+    user_type = None
+    if hasattr(user, 'userprofile') and user.userprofile:
+        user_type = user.userprofile.user_type
 
-    if user_type == "Candidate":
-        interview_requests = InterviewRequest.objects.filter(  # type: ignore[misc]
-            candidate=user.candidate  # type: ignore[misc]
+    if user_type == "Candidate" and hasattr(user, 'candidate'):
+        interview_requests = InterviewRequest.objects.filter(
+            candidate=user.candidate
         ).all()
-    elif user_type == "Recruiter":
-        interview_requests = InterviewRequest.objects.filter(  # type: ignore[misc]
-            job__recruiter=user.recruiter  # type: ignore[misc]
+    elif user_type == "Recruiter" and hasattr(user, 'recruiter'):
+        interview_requests = InterviewRequest.objects.filter(
+            job__recruiter=user.recruiter
         ).all()
-    elif user_type == "Employer":
-        interview_requests = InterviewRequest.objects.filter(  # type: ignore[misc]
-            job__employer=user.employer  # type: ignore[misc]
+    elif user_type == "Employer" and hasattr(user, 'employer'):
+        interview_requests = InterviewRequest.objects.filter(
+            job__employer=user.employer
         ).all()
-    elif user.is_staff:
-        interview_requests = InterviewRequest.objects.all()  # type: ignore[misc]
+    elif hasattr(user, 'is_staff') and user.is_staff:
+        interview_requests = InterviewRequest.objects.all()
     else:
         raise PermissionDenied
 

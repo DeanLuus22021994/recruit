@@ -4,7 +4,7 @@ from typing import Optional
 
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse  # type: ignore[import-untyped]
+from django.urls import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
@@ -17,7 +17,7 @@ from .models import Candidate, CandidateDocument
 def apply(request: HttpRequest) -> HttpResponse:
     """Handle candidate application process."""
     key = request.GET.get("key", None)
-    user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
+    user: Optional[User] = UserProfile.verify_token(key)
 
     if not key and request.method == "POST":
         form = UserApplyStep1Form(request.POST)
@@ -31,7 +31,7 @@ def apply(request: HttpRequest) -> HttpResponse:
             skype_id = data["skype_id"]
             timezone = data["timezone"]
 
-            user, created = User.objects.get_or_create(  # type: ignore[misc]
+            user, created = User.objects.get_or_create(
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
@@ -52,10 +52,11 @@ def apply(request: HttpRequest) -> HttpResponse:
 
                 userprofile.save()
 
-                key = user.userprofile.generate_token()  # type: ignore[misc]
+                if hasattr(user, 'userprofile') and user.userprofile:
+                    key = user.userprofile.generate_token()
 
-                redirect_url = reverse("candidate_apply") + "?key=" + key
-                return HttpResponseRedirect(redirect_url)
+                    redirect_url = reverse("candidate_apply") + "?key=" + key
+                    return HttpResponseRedirect(redirect_url)
 
     elif not key and request.method == "GET":
         form = UserApplyStep1Form()
@@ -68,15 +69,18 @@ def apply(request: HttpRequest) -> HttpResponse:
             data = form.data
 
             try:
-                candidate = user.candidate  # type: ignore[misc]
-                candidate.birth_year = data["birth_year"]
-                candidate.gender = data["gender"]
-                candidate.education = data["education"]
-                candidate.education_major = data["education_major"]
-                candidate.image = files["image"]
-                candidate.save()
-            except Candidate.DoesNotExist:  # type: ignore[misc]
-                candidate = Candidate.objects.create(  # type: ignore[misc]
+                if hasattr(user, 'candidate') and user.candidate:
+                    candidate = user.candidate
+                    candidate.birth_year = data["birth_year"]
+                    candidate.gender = data["gender"]
+                    candidate.education = data["education"]
+                    candidate.education_major = data["education_major"]
+                    candidate.image = files["image"]
+                    candidate.save()
+                else:
+                    raise Candidate.DoesNotExist()
+            except (Candidate.DoesNotExist, AttributeError):
+                candidate = Candidate.objects.create(
                     user=user,
                     birth_year=data["birth_year"],
                     gender=data["gender"],
@@ -84,7 +88,7 @@ def apply(request: HttpRequest) -> HttpResponse:
                     education_major=data["education_major"],
                     image=files["image"],
                 )
-            CandidateDocument.objects.create(  # type: ignore[misc]
+            CandidateDocument.objects.create(
                 candidate=candidate,
                 document=files["resume"],
                 document_type="Resume",
@@ -114,7 +118,7 @@ def apply(request: HttpRequest) -> HttpResponse:
 def apply_success(request: HttpRequest) -> HttpResponse:
     """Display application success page."""
     key = request.GET.get("key", None)
-    user: Optional[User] = UserProfile.verify_token(key)  # type: ignore[misc]
+    user: Optional[User] = UserProfile.verify_token(key)
 
     jobs_url = None
     availability_url = None

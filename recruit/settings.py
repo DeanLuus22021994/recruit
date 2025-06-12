@@ -207,8 +207,9 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # Sendgrid Email API Configuration
 EMAIL_BACKEND = "sgbackend.SendGridBackend"
-SENDGRID_USER = os.environ["SENDGRID_USER"]
-SENDGRID_PASSWORD = os.environ["SENDGRID_PASSWORD"]
+SENDGRID_USER = os.environ.get("SENDGRID_USER", "")
+SENDGRID_PASSWORD = os.environ.get("SENDGRID_PASSWORD", "")
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
 
 MESSAGE_TAGS = {
     messages.DEBUG: "debug",

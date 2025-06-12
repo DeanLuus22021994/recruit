@@ -16,19 +16,15 @@ except ImportError:
 class Recruiter(models.Model):
     """Model representing a recruiter user."""
 
-    user: models.OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number: PhoneNumberField = PhoneNumberField(max_length=20)
-    date_of_birth: models.DateField = models.DateField()
-    location: models.CharField = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = PhoneNumberField(max_length=20)
+    date_of_birth = models.DateField()
+    location = models.CharField(max_length=100)
     image = models.ImageField(upload_to="recruiter/%Y/%m/%d")
     thumb = models.ImageField(upload_to="recruiter/%Y/%m/%d", blank=True)
-    is_active: models.BooleanField = models.BooleanField(default=True)
-    last_modified: models.DateTimeField = models.DateTimeField(
-        auto_now_add=False, auto_now=True
-    )
-    created: models.DateTimeField = models.DateTimeField(
-        auto_now_add=True, auto_now=False
-    )
+    is_active = models.BooleanField(default=True)
+    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     def __str__(self) -> str:
         """Return string representation of the recruiter."""
@@ -38,7 +34,8 @@ class Recruiter(models.Model):
         """Save the recruiter instance with thumbnail generation."""
         from recruit.utils import generate_thumbnail
 
-        self.thumb = generate_thumbnail(self.image)
+        if self.image:
+            self.thumb = generate_thumbnail(self.image)
         super(Recruiter, self).save(*args, **kwargs)
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
