@@ -42,7 +42,7 @@ httplib2==0.22.0
 requests==2.32.3
 
 # Email services
-sendgrid==6.11.0
+sendgrid==3.6.5
 sendgrid-django==4.2.0
 
 # Utility libraries
