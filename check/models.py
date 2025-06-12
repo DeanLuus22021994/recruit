@@ -90,6 +90,3 @@ except ImportError as e:
 except AssertionError as e:
     print(f"❌ Assertion error: {e}")
     sys.exit(1)
-except Exception as e:
-    print(f"❌ Unexpected error: {e}")
-    sys.exit(1)
