@@ -21,7 +21,7 @@ def get_candidate(candidate_id: int) -> Any:
     try:
         from candidates.models import Candidate
 
-        return Candidate.objects.get(id=candidate_id)
+        return Candidate.objects.get(id=candidate_id)  # type: ignore[attr-defined]
     except ImportError:
         return None
 
@@ -61,7 +61,7 @@ class UserTestCase(TestCase):
             return
 
         user = get_user(1)
-        candidate = Candidate.objects.create(
+        candidate = Candidate.objects.create(  # type: ignore[attr-defined]
             user=user,
             birth_year="1970",
             gender="male",

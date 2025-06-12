@@ -7,13 +7,15 @@ from django.http import HttpRequest
 
 try:
     from allauth.account.adapter import DefaultAccountAdapter
+
+    ALLAUTH_AVAILABLE = True
 except ImportError:
     # Fallback for type checking when allauth is not available
-    class DefaultAccountAdapter:  # type: ignore
-        pass
+    ALLAUTH_AVAILABLE = False
+    DefaultAccountAdapter = object  # Use object as base class
 
 
-class MyAccountAdapter(DefaultAccountAdapter):
+class MyAccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
     """Custom account adapter with phone number support."""
 
     def get_login_redirect_url(self, request: HttpRequest) -> str:
@@ -55,17 +57,27 @@ class MyAccountAdapter(DefaultAccountAdapter):
     ) -> None:
         """Send SMS verification code."""
         # Implementation would depend on your SMS service
-        # Using ellipsis to indicate implementation needed
-        ...
+        # Mark parameters as used
+        _ = user
+        _ = phone
+        _ = code
+        _ = kwargs
+        pass
 
     def set_phone(self, user: Any, phone: str, verified: bool = False) -> None:
         """Set phone number for user."""
         # Implementation depends on your user model structure
-        # Using ellipsis to indicate implementation needed
-        ...
+        # Mark parameters as used
+        _ = user
+        _ = phone
+        _ = verified
+        pass
 
     def set_phone_verified(self, user: Any, phone: str, verified: bool = True) -> None:
         """Set phone verification status."""
         # Implementation depends on your user model structure
-        # Using ellipsis to indicate implementation needed
-        ...
+        # Mark parameters as used
+        _ = user
+        _ = phone
+        _ = verified
+        pass

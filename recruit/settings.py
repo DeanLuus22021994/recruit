@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "recruiters",
     "candidates",
     "dashboards",
+    "sendgrid",  # Add the new SendGrid app
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -206,7 +207,7 @@ ACCOUNT_PASSWORD_MIN_LENGTH = 6
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # Sendgrid Email API Configuration
-EMAIL_BACKEND = "sgbackend.SendGridBackend"
+EMAIL_BACKEND = "sendgrid.backends.SendGridBackend"
 SENDGRID_USER = os.environ.get("SENDGRID_USER", "")
 SENDGRID_PASSWORD = os.environ.get("SENDGRID_PASSWORD", "")
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")

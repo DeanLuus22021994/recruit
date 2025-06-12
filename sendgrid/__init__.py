@@ -1,0 +1,1 @@
+"""SendGrid Django app for handling email functionality."""

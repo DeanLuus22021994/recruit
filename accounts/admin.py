@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from .models import UserProfile
 
 
-class UserCreationForm(forms.ModelForm):
+class UserCreationForm(forms.ModelForm[User]):
     """Form for creating new users."""
 
     class Meta:
@@ -32,7 +32,7 @@ class UserCreationForm(forms.ModelForm):
 
     def save(self, commit: bool = True) -> User:
         """Save the user instance."""
-        user = super().save(commit=False)
+        user: User = super().save(commit=False)
         if self.cleaned_data.get("email"):
             user.username = self.cleaned_data["email"]
         if commit:
@@ -40,7 +40,7 @@ class UserCreationForm(forms.ModelForm):
         return user
 
 
-class UserChangeForm(forms.ModelForm):
+class UserChangeForm(forms.ModelForm[User]):
     """Form for updating users."""
 
     password = ReadOnlyPasswordHashField()
@@ -54,7 +54,7 @@ class UserChangeForm(forms.ModelForm):
         return str(self.initial.get("password", ""))
 
 
-class UserProfileInline(admin.StackedInline):
+class UserProfileInline(admin.StackedInline[UserProfile, User]):
     """Inline admin for user profiles."""
 
     model = UserProfile
@@ -62,7 +62,7 @@ class UserProfileInline(admin.StackedInline):
     can_delete = False
 
 
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin[User]):
     """Admin interface for User model."""
 
     form = UserChangeForm
