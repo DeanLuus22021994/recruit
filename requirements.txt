@@ -39,7 +39,7 @@ ipython-genutils==0.2.0
 
 # HTTP and web utilities
 httplib2==0.22.0
-requests==2.32.3
+requests==2.32.4
 
 # Email services
 sendgrid==6.12.4
