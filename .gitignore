@@ -7,3 +7,6 @@
 
 # Ensure all VS Code Insiders config files are tracked
 !.vscode-insiders/
+
+# Ensure all VS Code config files are tracked
+!.vscode/
