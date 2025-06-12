@@ -17,10 +17,8 @@ class Country(models.Model):
 
 
 class Job(models.Model):
-    """Model representing a job posting."""
-
-    employer = models.ForeignKey(
-        "models.Employer", on_delete=models.CASCADE, related_name="jobs"
+    """Model representing a job posting."""    employer = models.ForeignKey(
+        "recruit_models.Employer", on_delete=models.CASCADE, related_name="jobs"
     )
     title = models.CharField(max_length=100)
     location = models.CharField(
