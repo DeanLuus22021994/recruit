@@ -11,6 +11,8 @@
     "httplib",
     "ipython",
     "jmespath",
+    "libfreetype",
+    "libjpeg",
     "localflavor",
     "noninteractive",
     "pexpect",
