@@ -1,0 +1,30 @@
+{
+  "cSpell.words": [
+    "createsuperuser",
+    "devcontainers",
+    "SENDGRID",
+    "setuptools",
+    "shutil",
+    "phonenumberslite",
+    "pickleshare",
+    "ptyprocess",
+    "pytz",
+    "sendgrid",
+    "shortuuid",
+    "simplegeneric",
+    "smtpapi",
+    "traitlets",
+    "autofixture",
+    "boto",
+    "botocore",
+    "dateutil",
+    "defusedxml",
+    "genutils",
+    "httplib",
+    "ipython",
+    "jmespath",
+    "localflavor",
+    "pexpect",
+    "phonenumber"
+  ]
+}
