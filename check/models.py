@@ -9,6 +9,12 @@ import sys
 # Add the project directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Configure Django settings
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "recruit.settings")
+import django
+
+django.setup()
+
 try:
     # Test recruit_models imports
     print("Testing recruit_models imports...")
