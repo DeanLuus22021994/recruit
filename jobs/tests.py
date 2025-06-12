@@ -1,4 +1,3 @@
-# filepath: c:\Projects\recruit\jobs\tests.py
 from datetime import date
 
 from django.contrib.auth.models import User
@@ -17,18 +16,15 @@ class JobModelTest(TestCase):
         )
 
         # Create a recruiter
-        self.recruiter = Recruiter.objects.create(
+        self.recruiter = Recruiter.objects.create(  # type: ignore[misc]
             user=self.user,
             phone_number="+1234567890",
             date_of_birth=date(1990, 1, 1),
             location="Test City",
         )
 
-        # Create an employer (assuming it exists)
-        # This might need adjustment based on the Employer model structure
-
     def test_country_creation(self) -> None:
-        country = Country.objects.create(country="United States")
+        country = Country.objects.create(country="United States")  # type: ignore[misc]
         self.assertEqual(str(country), "United States")
 
     def test_job_str_method(self) -> None:
