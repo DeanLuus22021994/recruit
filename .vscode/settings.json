@@ -3,6 +3,7 @@
     "autofixture",
     "boto",
     "botocore",
+    "CONFIRMATON",
     "createsuperuser",
     "dateutil",
     "defusedxml",
@@ -14,6 +15,7 @@
     "libfreetype",
     "libjpeg",
     "localflavor",
+    "MEDIAFILES",
     "modelfields",
     "noninteractive",
     "pexpect",
@@ -27,10 +29,14 @@
     "sendgrid",
     "SENDGRID",
     "setuptools",
+    "sgbackend",
     "shortuuid",
     "shutil",
     "simplegeneric",
     "smtpapi",
+    "socialaccount",
+    "testpass",
+    "testrecruiter",
     "traitlets"
   ]
 }
