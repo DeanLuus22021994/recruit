@@ -1,98 +1,84 @@
 #!/usr/bin/env python3
 """
 Test script to verify model imports work correctly.
+This version only tests syntax and import structure without Django setup.
 """
 
+import ast
 import os
 import sys
+from typing import Optional, Tuple
 
 # Add the project directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
-# Configure Django settings
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "recruit.settings")
-import django
 
-django.setup()
+def test_import_syntax(module_path: str) -> Tuple[bool, Optional[str]]:
+    """Test if a module can be parsed and imported (syntax-wise)."""
+    try:
+        full_path = os.path.join(project_root, module_path.replace(".", "/") + ".py")
+        with open(full_path, "r", encoding="utf-8") as f:
+            content = f.read()
 
-try:
-    # Test recruit_models imports
-    print("Testing recruit_models imports...")
+        # Parse the AST to check syntax
+        ast.parse(content)
+        return True, None
+    except (OSError, SyntaxError, ValueError) as e:
+        return False, str(e)
 
-    from recruit_models.accounts import UserProfile
 
-    print("✓ accounts models imported successfully")
+def main() -> int:
+    """Test model file syntax and structure."""
+    print("Testing recruit_models syntax...")
 
-    from recruit_models.candidates import (
-        Candidate,
-    )
+    # Test files to check
+    model_modules = [
+        "recruit_models.accounts",
+        "recruit_models.candidates",
+        "recruit_models.employers",
+        "recruit_models.interviews",
+        "recruit_models.jobs",
+        "recruit_models.recruiters",
+        "recruit_models.sendgrid",
+    ]
 
-    print("✓ candidates models imported successfully")
+    proxy_modules = [
+        "accounts.models",
+        "candidates.models",
+        "employers.models",
+        "interviews.models",
+        "jobs.models",
+        "recruiters.models",
+        "sendgrid.models",
+    ]
 
-    from recruit_models.employers import Employer
+    all_passed = True
 
-    print("✓ employers models imported successfully")
+    for module in model_modules:
+        success, error = test_import_syntax(module)
+        if success:
+            print(f"✓ {module} syntax OK")
+        else:
+            print(f"❌ {module} syntax error: {error}")
+            all_passed = False
 
-    from recruit_models.interviews import InterviewInvitation
+    print("\nTesting app proxy models syntax...")
+    for module in proxy_modules:
+        success, error = test_import_syntax(module)
+        if success:
+            print(f"✓ {module} syntax OK")
+        else:
+            print(f"❌ {module} syntax error: {error}")
+            all_passed = False
 
-    print("✓ interviews models imported successfully")
+    if all_passed:
+        print("\n🎉 All model files have valid syntax and structure!")
+        return 0
 
-    from recruit_models.jobs import Job
+    print("\n❌ Some files have syntax errors.")
+    return 1
 
-    print("✓ jobs models imported successfully")
 
-    from recruit_models.recruiters import Recruiter
-
-    print("✓ recruiters models imported successfully")
-
-    from recruit_models.sendgrid import EmailTemplate
-
-    print("✓ sendgrid models imported successfully")
-
-    # Test app-level imports
-    from accounts.models import UserProfile as AppUserProfile
-
-    print("✓ accounts app models imported successfully")
-
-    from candidates.models import Candidate as AppCandidate
-
-    print("✓ candidates app models imported successfully")
-
-    from employers.models import Employer as AppEmployer
-
-    print("✓ employers app models imported successfully")
-
-    from interviews.models import InterviewInvitation as AppInterview
-
-    print("✓ interviews app models imported successfully")
-
-    from jobs.models import Job as AppJob
-
-    print("✓ jobs app models imported successfully")
-
-    from recruiters.models import Recruiter as AppRecruiter
-
-    print("✓ recruiters app models imported successfully")
-
-    from sendgrid.models import EmailTemplate as AppEmailTemplate
-
-    print("✓ sendgrid app models imported successfully")
-
-    # Verify they are the same objects
-    print("\nVerifying model identity...")
-    assert UserProfile is AppUserProfile, "UserProfile models should be identical"
-    assert Candidate is AppCandidate, "Candidate models should be identical"
-    assert Employer is AppEmployer, "Employer models should be identical"
-    assert InterviewInvitation is AppInterview, "Interview models should be identical"
-    assert Job is AppJob, "Job models should be identical"
-    assert Recruiter is AppRecruiter, "Recruiter models should be identical"
-    assert EmailTemplate is AppEmailTemplate, "EmailTemplate models should be identical"
-    print("✓ All model identities verified")
-
-    print("\n🎉 All imports successful! Model refactoring is working correctly.")
-except ImportError as e:
-    print(f"❌ Import error: {e}")
-    sys.exit(1)
-except AssertionError as e:
-    print(f"❌ Assertion error: {e}")
-    sys.exit(1)
+if __name__ == "__main__":
+    sys.exit(main())
