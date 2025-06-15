@@ -12,7 +12,14 @@ from django.template.exceptions import TemplateDoesNotExist, TemplateSyntaxError
 from django.utils import timezone
 from django.utils.html import strip_tags
 
-from .models import EmailLog, EmailTemplate
+# Import models with proper typing
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .models import EmailLog, EmailTemplate
+else:
+    # Import at runtime for Django ORM functionality
+    from .models import EmailLog, EmailTemplate
 
 logger = logging.getLogger(__name__)
 
