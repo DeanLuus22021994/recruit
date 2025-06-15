@@ -21,21 +21,21 @@ from __future__ import annotations
 import sys
 from typing import (
     TYPE_CHECKING,
-    Any,
-    ClassVar,
     Dict,
     Final,
     List,
-    Literal,
-    Optional,
     Protocol,
     Tuple,
     Type,
-    TypeAlias,
     TypeVar,
     Union,
     runtime_checkable,
 )
+
+try:
+    from typing import TypeAlias
+except ImportError:
+    from typing_extensions import TypeAlias
 
 # PEP 561 compliance markers
 __pep561__: Final[bool] = True
@@ -54,46 +54,44 @@ PYRIGHT_VERSION_REQUIRED: Final[str] = "1.1.350+"
 PYLANCE_SUPPORTED: Final[bool] = True
 
 # Generic type variables for Django models
-_ModelT = TypeVar("_ModelT", bound="models.Model")
-_UserT = TypeVar("_UserT", bound="User")
-_QuerySetT = TypeVar("_QuerySetT", bound="models.QuerySet[Any]")
-_ManagerT = TypeVar("_ManagerT", bound="models.Manager[Any]")
+ModelT = TypeVar("ModelT", bound="models.Model")
+UserT = TypeVar("UserT", bound="User")
 
 # Django field type aliases for better inference
 ModelFieldType: TypeAlias = Union[
-    "models.CharField",
-    "models.TextField",
-    "models.IntegerField",
-    "models.BooleanField",
-    "models.DateTimeField",
-    "models.DateField",
-    "models.EmailField",
+# Django field type aliases for better inference
+ModelFieldType: TypeAlias = Union[
+    "models.CharField[str, str]",
+    "models.TextField[str, str]",
+    "models.IntegerField[int, int]",
+    "models.BooleanField[bool, bool]",
+    "models.DateTimeField[str, str]",
+    "models.DateField[str, str]",
+    "models.EmailField[str, str]",
     "models.ImageField",
     "models.FileField",
-    "models.URLField",
-    "models.SlugField",
-    "models.UUIDField",
+    "models.URLField[str, str]",
+    "models.SlugField[str, str]",
+    "models.UUIDField[str, str]",
     "models.JSONField",
-    "models.DecimalField",
-    "models.FloatField",
-    "models.BigIntegerField",
-    "models.SmallIntegerField",
-    "models.PositiveIntegerField",
-    "models.ForeignKey[Any, Any]",
-    "models.OneToOneField[Any, Any]",
-    "models.ManyToManyField[Any]",
+    "models.DecimalField[str, str]",
+    "models.FloatField[float, float]",
+    "models.BigIntegerField[int, int]",
+    "models.SmallIntegerField[int, int]",
+    "models.PositiveIntegerField[int, int]",
+    "models.ForeignKey[str, str]",
+    "models.OneToOneField[str, str]",
+    "models.ManyToManyField[str, str]",
 ]
-
-# Signal handler type alias
 SignalHandlerType: TypeAlias = "Callable[[Any, Any, bool], None]"
 
 # Choice field type aliases
 ChoiceType: TypeAlias = Tuple[str, str]
+# Choice field type aliases
+ChoiceType: TypeAlias = Tuple[str, str]
 ChoicesType: TypeAlias = Tuple[ChoiceType, ...]
-StatusChoiceType: TypeAlias = Tuple[int, str]
-StatusChoicesType: TypeAlias = Tuple[StatusChoiceType, ...]
-
-# File upload type aliases
+EmailStatusChoiceType: TypeAlias = Tuple[int, str]
+EmailStatusChoicesType: TypeAlias = Tuple[EmailStatusChoiceType, ...]
 ImageUploadType: TypeAlias = Union[
     "models.ImageField", "InMemoryUploadedFile", "TemporaryUploadedFile"
 ]
@@ -104,17 +102,19 @@ FileUploadType: TypeAlias = Union[
 
 # Error handling types
 class ModelValidationError(Exception):
+# Error handling types
+class ModelValidationError(Exception):
     """Custom exception for model validation errors."""
 
-    pass
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.message = message
 
 
 class TypeCheckError(Exception):
     """Custom exception for type checking errors."""
 
-    pass
-
-
+    def __init__(self, message: str) -> None:
 # Runtime type checking configuration
 @runtime_checkable
 class TypeCheckingConfig(Protocol):
@@ -126,6 +126,38 @@ class TypeCheckingConfig(Protocol):
     generic_support: bool
     error_reporting: bool
 
+    def validate_config(self) -> bool:
+class AdvancedTypeConfig:
+    """Advanced configuration class for type checking tools and IDEs."""
+
+    # Core configuration
+    STRICT_MODE: Final[bool] = True
+    DJANGO_INTEGRATION: Final[bool] = True
+    PROTOCOL_CHECKING: Final[bool] = True
+    GENERIC_SUPPORT: Final[bool] = True
+    ERROR_REPORTING: Final[bool] = True
+
+    @classmethod
+    def get_config(cls) -> Dict[str, bool]:
+        """Get configuration as dictionary."""
+        return {
+            "strict_mode": cls.STRICT_MODE,
+            "django_integration": cls.DJANGO_INTEGRATION,
+            "protocol_checking": cls.PROTOCOL_CHECKING,
+            "generic_support": cls.GENERIC_SUPPORT,
+            "error_reporting": cls.ERROR_REPORTING,
+        }
+
+    @classmethod
+    def validate_settings(cls) -> bool:
+        """Validate all configuration settings."""
+        return all([
+            cls.STRICT_MODE,
+            cls.DJANGO_INTEGRATION,
+            cls.PROTOCOL_CHECKING,
+            cls.GENERIC_SUPPORT,
+            cls.ERROR_REPORTING,
+        ])
 
 class AdvancedTypeConfig:
     """Advanced configuration class for type checking tools and IDEs."""
@@ -206,38 +238,6 @@ class AdvancedTypeConfig:
     }
 
     # Image/File field configurations
-    IMAGE_FIELDS: Final[Dict[str, Tuple[str, ...]]] = {
-        "Candidate": ("image", "thumb"),
-        "Employer": ("business_license", "business_license_thumb"),
-        "EmployerImages": ("image", "thumb"),
-        "Recruiter": ("image", "thumb"),
-    }
-
-    FILE_FIELDS: Final[Dict[str, Tuple[str, ...]]] = {
-        "CandidateDocument": ("document",),
-    }
-
-    # Choice field definitions
-    CHOICE_FIELDS: Final[Dict[str, str]] = {
-        "gender": "GENDER_CHOICES",
-        "education": "EDUCATION_CHOICES",
-        "employer_type": "EMPLOYER_TYPE_CHOICES",
-        "status": "EMAIL_STATUS_CHOICES",
-        "user_type": "USER_TYPE_CHOICES",
-        "location": "LOCATION_CHOICES",
-        "compensation_type": "COMPENSATION_TYPE_CHOICES",
-    }
-
-    # Signal configuration
-    SIGNAL_HANDLERS: Final[Dict[str, str]] = {
-        "Candidate": "candidate_update_user_profile",
-        "Employer": "employer_update_user_profile",
-        "Recruiter": "recruiter_update_user_profile",
-        "InterviewRequest": "generate_invitation",
-        "User": "create_account_emailaddress",
-    }
-
-
 # Type checking imports (only loaded during static analysis)
 if TYPE_CHECKING:
     from typing import Callable
@@ -248,28 +248,6 @@ if TYPE_CHECKING:
         TemporaryUploadedFile,
     )
     from django.db import models
-    from django.db.models import QuerySet
-
-    # Import all protocol types for comprehensive type checking
-    from recruit_types.accounts import TokenVerificationResult, UserProfileType
-    from recruit_types.candidates import (
-        CandidateDocumentType,
-        CandidateRequirementsType,
-        CandidateType,
-    )
-    from recruit_types.employers import (
-        EmployerImagesType,
-        EmployerRequirementsType,
-        EmployerType,
-    )
-    from recruit_types.interviews import (
-        AvailableType,
-        ExclusionType,
-        InterviewInvitationType,
-        InterviewRequestType,
-        StatusChoiceType,
-    )
-    from recruit_types.jobs import (
         CountryType,
         JobRequirementsType,
         JobType,
@@ -327,23 +305,43 @@ class DevelopmentConfig:
 # Export main configuration classes
 __type_config__: Final[Type[AdvancedTypeConfig]] = AdvancedTypeConfig
 __dev_config__: Final[Type[DevelopmentConfig]] = DevelopmentConfig
+class DevelopmentConfig:
+    """Configuration for development and debugging tools."""
 
+    DEBUG_TYPE_CHECKING: Final[bool] = False
+    VERBOSE_ERROR_REPORTING: Final[bool] = True
+    PERFORMANCE_MONITORING: Final[bool] = True
 
-# Version compatibility checks
-def _check_python_version() -> bool:
-    """Check if Python version meets requirements."""
-    return sys.version_info >= (3, 12)
+    # IDE integration settings
+    AUTOCOMPLETE_ENHANCED: Final[bool] = True
+    REFACTORING_SUPPORT: Final[bool] = True
+    CODE_NAVIGATION: Final[bool] = True
 
+    # Linting and formatting
+    MYPY_STRICT: Final[bool] = True
+    PYLINT_INTEGRATION: Final[bool] = True
+    BLACK_COMPATIBLE: Final[bool] = True
+    ISORT_COMPATIBLE: Final[bool] = True
 
+    @classmethod
+    def get_development_settings(cls) -> Dict[str, bool]:
+        """Get development configuration as dictionary."""
+        return {
+            "debug_type_checking": cls.DEBUG_TYPE_CHECKING,
+            "verbose_error_reporting": cls.VERBOSE_ERROR_REPORTING,
+            "performance_monitoring": cls.PERFORMANCE_MONITORING,
+            "autocomplete_enhanced": cls.AUTOCOMPLETE_ENHANCED,
+            "refactoring_support": cls.REFACTORING_SUPPORT,
+            "code_navigation": cls.CODE_NAVIGATION,
+            "mypy_strict": cls.MYPY_STRICT,
+            "pylint_integration": cls.PYLINT_INTEGRATION,
 def _check_typing_extensions() -> bool:
     """Check if typing_extensions is available for older Python versions."""
     try:
-        import typing_extensions  # noqa: F401
-
-        return True
+        import typing_extensions
+        return hasattr(typing_extensions, 'TypeAlias')
     except ImportError:
         return False
-
 
 # Runtime checks (only if not in type checking mode)
 if not TYPE_CHECKING:
@@ -361,6 +359,8 @@ if not TYPE_CHECKING:
 
 # Final exports for type checkers and runtime
 __all__: Final[List[str]] = [
+# Final exports for type checkers and runtime
+__all__: Final[List[str]] = [
     # Configuration classes
     "AdvancedTypeConfig",
     "DevelopmentConfig",
@@ -370,23 +370,20 @@ __all__: Final[List[str]] = [
     "SignalHandlerType",
     "ChoiceType",
     "ChoicesType",
-    "StatusChoiceType",
-    "StatusChoicesType",
+    "EmailStatusChoiceType",
+    "EmailStatusChoicesType",
     "ImageUploadType",
     "FileUploadType",
     # Exception classes
     "ModelValidationError",
     "TypeCheckError",
+    # Type variables
+    "ModelT",
+    "UserT",
     # Metadata
     "__version__",
     "__author__",
     "__django_version__",
-    "__python_version__",
-]
-
 # Ensure this file is recognized as a type stub
-if not TYPE_CHECKING:
-    # Add runtime marker for debugging
-    __runtime_type_checking__ = False
-else:
+__runtime_type_checking__ = not TYPE_CHECKING
     __runtime_type_checking__ = True
