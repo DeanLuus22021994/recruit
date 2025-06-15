@@ -1,11 +1,17 @@
 """Django admin configuration for employers app."""
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 
 from .models import Employer, EmployerImages, EmployerRequirements
 
+if TYPE_CHECKING:
+    from django.db.models import Model
 
-class EmployerRequirementsInline(admin.StackedInline):
+
+class EmployerRequirementsInline(admin.StackedInline[EmployerRequirements]):
     """Inline admin for employer requirements."""
 
     model = EmployerRequirements
@@ -13,7 +19,7 @@ class EmployerRequirementsInline(admin.StackedInline):
     verbose_name_plural = "Preferences"
 
 
-class EmployerImagesInline(admin.StackedInline):
+class EmployerImagesInline(admin.StackedInline[EmployerImages]):
     """Inline admin for employer images."""
 
     model = EmployerImages
@@ -22,7 +28,7 @@ class EmployerImagesInline(admin.StackedInline):
     exclude = ("thumb",)
 
 
-class EmployerAdmin(admin.ModelAdmin):
+class EmployerAdmin(admin.ModelAdmin[Employer]):
     """Admin interface for Employer model."""
 
     # inlines = (EmployerRequirementsInline,)
