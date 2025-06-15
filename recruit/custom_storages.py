@@ -6,14 +6,16 @@ from django.conf import settings
 from django.core.files.storage import DefaultStorage
 
 try:
-    from storages.backends.s3boto3 import S3Boto3Storage
+    from storages.backends.s3boto3 import S3Boto3Storage  # type: ignore[import-untyped]
 except ImportError:
     # Fallback for older versions
     try:
-        from storages.backends.s3boto import S3BotoStorage as S3Boto3Storage
+        from storages.backends.s3boto import (  # type: ignore[import-untyped]
+            S3BotoStorage as S3Boto3Storage
+        )
     except ImportError:
         # Final fallback
-        S3Boto3Storage = DefaultStorage
+        S3Boto3Storage = DefaultStorage  # type: ignore[assignment, misc]
 
 
 class StaticStorage(S3Boto3Storage):  # type: ignore[misc]

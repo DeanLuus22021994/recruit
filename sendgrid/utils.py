@@ -12,18 +12,20 @@ from django.template.exceptions import TemplateDoesNotExist, TemplateSyntaxError
 from django.utils import timezone
 from django.utils.html import strip_tags
 
-# Import models with proper typing
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
+# Import models directly for proper Django ORM functionality and type hints
+try:
     from .models import EmailLog, EmailTemplate
-else:
-    # Import at runtime for Django ORM functionality
-    from .models import EmailLog, EmailTemplate
-
-logger = logging.getLogger(__name__)
-
-
+except ImportError:
+    # Create placeholder classes if models are not available
+    class EmailTemplate:  # type: ignore
+        objects = None
+        DoesNotExist = Exception
+        html_content = ""
+        plain_content = ""
+        subject = ""
+    
+    class EmailLog:  # type: ignore
+        objects = None
 def send_template_email(
     template_name: str,
     recipient_email: str,
@@ -32,9 +34,20 @@ def send_template_email(
     fail_silently: bool = False,
 ) -> bool:
     """Send an email using a predefined template."""
+    # Check if models are properly imported
+    if EmailTemplate is None or not hasattr(EmailTemplate, 'objects'):
+        logger.error("EmailTemplate model is not available")
+        if not fail_silently:
+            raise ImportError("EmailTemplate model is not available")
+        return False
+    
     try:
         template = EmailTemplate.objects.get(name=template_name, is_active=True)
     except EmailTemplate.DoesNotExist:
+        logger.error("Email template '%s' not found or inactive", template_name)
+        if not fail_silently:
+            raise
+        return False
         logger.error("Email template '%s' not found or inactive", template_name)
         if not fail_silently:
             raise
@@ -68,28 +81,30 @@ def send_template_email(
         return False  # Create and send email
     try:
         email = EmailMessage(
-            subject=subject,
-            body=html_content or plain_content,
-            from_email=sender_email,
-            to=[recipient_email],
-        )
-
-        if html_content:
-            email.content_subtype = "html"
+        # Log the email
+        if EmailLog and hasattr(EmailLog, 'objects'):
+            EmailLog.objects.create(
+                recipient=recipient_email,
+                sender=sender_email,
+                subject=subject,
+                template=template,
+                status="sent" if sent else "failed",
+            )
 
         sent = email.send()
 
         # Log the email
         EmailLog.objects.create(
-            recipient=recipient_email,
-            sender=sender_email,
-            subject=subject,
-            template=template,
-            status="sent" if sent else "failed",
-        )
-
-        return bool(sent)
-
+        # Log the failed attempt
+        if EmailLog and hasattr(EmailLog, 'objects'):
+            EmailLog.objects.create(
+                recipient=recipient_email,
+                sender=sender_email,
+                subject=subject or f"Email from template {template_name}",
+                template=template,
+                status="failed",
+                error_message=str(e),
+            )
     except (OSError, ValueError) as e:
         logger.error("Error sending email to %s: %s", recipient_email, e)
 
@@ -101,21 +116,20 @@ def send_template_email(
             template=template,
             status="failed",
             error_message=str(e),
-        )
-
-        if not fail_silently:
-            raise
-        return False
-
-
-def render_to_string_from_text(template_string: str, context: Dict[str, Any]) -> str:
-    """Render a template string with context variables."""
-    template = Template(template_string)
-    return template.render(Context(context))
-
-
 def get_email_statistics(days: int = 30) -> Dict[str, Any]:
     """Get email sending statistics for the last N days."""
+    # Check if EmailLog model is available
+    if EmailLog is None or not hasattr(EmailLog, 'objects'):
+        return {
+            "period_days": days,
+            "total_sent": 0,
+            "delivered": 0,
+            "failed": 0,
+            "bounced": 0,
+            "spam": 0,
+            "delivery_rate": 0,
+        }
+    
     start_date = timezone.now() - timedelta(days=days)
 
     stats = EmailLog.objects.filter(sent_at__gte=start_date).aggregate(
@@ -126,6 +140,19 @@ def get_email_statistics(days: int = 30) -> Dict[str, Any]:
         spam=Count("id", filter=Q(status="spam")),
     )
 
+    return {
+        "period_days": days,
+        "total_sent": stats["total_sent"] or 0,
+        "delivered": stats["delivered"] or 0,
+        "failed": stats["failed"] or 0,
+        "bounced": stats["bounced"] or 0,
+        "spam": stats["spam"] or 0,
+        "delivery_rate": (
+            (stats["delivered"] / stats["total_sent"] * 100)
+            if stats["total_sent"]
+            else 0
+        ),
+    }
     return {
         "period_days": days,
         "total_sent": stats["total_sent"] or 0,

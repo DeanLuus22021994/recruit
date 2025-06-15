@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from typing import List, Union
+
 from django.conf import settings
-from django.conf.urls.static import static
+from django.conf.urls.static import static  # type: ignore
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import URLPattern, URLResolver, include, path, re_path
 from django.views.static import serve
 
 from candidates import views as candidatesViews
@@ -26,7 +28,7 @@ from interviews import views as interviewsViews
 from jobs import views as jobsViews
 from recruiters import views as recruitersViews
 
-urlpatterns = [
+urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("", dashboardViews.dashboards, name="dashboards"),
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),

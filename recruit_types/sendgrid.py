@@ -1,13 +1,13 @@
 """Type definitions for the sendgrid application."""
 
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, Tuple, runtime_checkable
 
 from django.db import models
 
 # Email status choices type definition
-EmailStatusType = tuple[str, str]
+EmailStatusType = Tuple[str, str]
 
-EMAIL_STATUS_CHOICES: tuple[EmailStatusType, ...] = (
+EMAIL_STATUS_CHOICES: Tuple[EmailStatusType, ...] = (
     ("pending", "Pending"),
     ("sent", "Sent"),
     ("delivered", "Delivered"),
@@ -32,6 +32,10 @@ class EmailTemplateType(Protocol):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the email template instance."""
+
+    def __str__(self) -> str:
+        """Return string representation of the email template."""
+        ...
 
 
 @runtime_checkable
