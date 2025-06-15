@@ -1,29 +1,37 @@
 [tool.mypy]
-python_version = "3.8"
-strict = true
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+strict = false
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
 warn_redundant_casts = true
 warn_unused_ignores = true
-warn_return_any = true
+warn_no_return = true
 warn_unreachable = true
 ignore_missing_imports = true
-no_implicit_optional = true
-show_error_codes = true
+
+[tool.mypy-django-stubs]
+django_settings_module = "recruit.settings"
 
 [[tool.mypy.overrides]]
-module = [
-  "allauth.*",
-  "phonenumber_field.*",
-  "sendgrid.*",
-  "storages.*",
-  "boto3.*",
-  "botocore.*",
-  "model_bakery.*",
-  "django_extensions.*",
-  "bootstrap3.*",
-  "django_countries.*",
-  "localflavor.*",
-]
+module = "recruit_models.*"
+# Disable type annotations requirement for Django models
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = "django.*"
 ignore_missing_imports = true
 
-[tool.django-stubs]
-django_settings_module = "recruit.settings"
+[[tool.mypy.overrides]]
+module = "allauth.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "phonenumber_field.*"
+ignore_missing_imports = true

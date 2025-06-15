@@ -1,7 +1,7 @@
 """Types package for the recruit application."""
 
 # Import all types to make them available at package level
-from .accounts import TokenVerificationResult, UserProfileType
+from ..accounts.types import TokenVerificationResult, UserProfileType
 from .candidates import CandidateDocumentType, CandidateRequirementsType, CandidateType
 from .employers import EmployerImagesType, EmployerRequirementsType, EmployerType
 from .interviews import (
