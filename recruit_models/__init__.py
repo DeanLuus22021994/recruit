@@ -1,7 +1,8 @@
-"""Models package for the recruit application."""
+"""Recruit models package.
 
-# Import all models to make them available at package level
-# Import STATUS_CHOICES from recruit_types since it's not defined in interviews.py
+This module imports all models to make them available at package level.
+"""
+# Import STATUS_CHOICES from recruit_types
 from recruit_types.interviews import STATUS_CHOICES
 
 from .accounts import UserProfile, create_account_emailaddress

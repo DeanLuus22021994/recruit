@@ -1,5 +1,7 @@
 """SendGrid models for tracking email statistics and templates."""
 
+from __future__ import annotations
+
 from django.db import models
 from django.utils import timezone
 
@@ -9,20 +11,16 @@ from recruit_types.sendgrid import EMAIL_STATUS_CHOICES
 class EmailTemplate(models.Model):
     """Model for storing reusable email templates."""
 
-    name: models.CharField[str, str] = models.CharField(max_length=100, unique=True)
-    subject: models.CharField[str, str] = models.CharField(max_length=200)
-    html_content: models.TextField[str, str] = models.TextField(blank=True)
-    plain_content: models.TextField[str, str] = models.TextField(blank=True)
-    sendgrid_template_id: models.CharField[str, str] = models.CharField(
-        max_length=100, blank=True
-    )
-    is_active: models.BooleanField = models.BooleanField(default=True)
-    created_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
-    updated_at: models.DateTimeField = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=100, unique=True)
+    subject = models.CharField(max_length=200)
+    html_content = models.TextField(blank=True)
+    plain_content = models.TextField(blank=True)
+    sendgrid_template_id = models.CharField(max_length=100, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        """Meta configuration for EmailTemplate model."""
-
         app_label = "sendgrid"
         ordering = ["name"]
 
@@ -33,25 +31,21 @@ class EmailTemplate(models.Model):
 class EmailLog(models.Model):
     """Model for tracking sent emails implementing EmailLogType."""
 
-    recipient: models.EmailField[str, str] = models.EmailField()
-    sender: models.EmailField[str, str] = models.EmailField()
-    subject: models.CharField[str, str] = models.CharField(max_length=200)
-    template: models.ForeignKey[EmailTemplate, "EmailLog"] = models.ForeignKey(
+    recipient = models.EmailField()
+    sender = models.EmailField()
+    subject = models.CharField(max_length=200)
+    template = models.ForeignKey(
         EmailTemplate, on_delete=models.SET_NULL, null=True, blank=True
     )
-    sendgrid_message_id: models.CharField[str, str] = models.CharField(
-        max_length=200, blank=True
-    )
-    status: models.CharField[str, str] = models.CharField(
+    sendgrid_message_id = models.CharField(max_length=200, blank=True)
+    status = models.CharField(
         max_length=20, choices=EMAIL_STATUS_CHOICES, default="pending"
     )
-    sent_at: models.DateTimeField = models.DateTimeField(default=timezone.now)
-    delivered_at: models.DateTimeField = models.DateTimeField(null=True, blank=True)
-    error_message: models.TextField[str, str] = models.TextField(blank=True)
+    sent_at = models.DateTimeField(default=timezone.now)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(blank=True)
 
     class Meta:
-        """Meta configuration for EmailLog model."""
-
         app_label = "sendgrid"
         ordering = ["-sent_at"]
         indexes = [
