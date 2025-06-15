@@ -6,13 +6,15 @@ from django.contrib import messages
 from django.http import HttpRequest
 
 try:
-    from allauth.account.adapter import DefaultAccountAdapter
-
-    ALLAUTH_AVAILABLE = True
+    from allauth.account.adapter import DefaultAccountAdapter  # type: ignore[import]
 except ImportError:
     # Fallback for type checking when allauth is not available
-    ALLAUTH_AVAILABLE = False
-    DefaultAccountAdapter = object  # Use object as base class
+    class DefaultAccountAdapter:  # type: ignore
+        """Fallback adapter class."""
+
+        def get_login_redirect_url(self, request: HttpRequest) -> str:
+            """Get the URL to redirect to after login."""
+            return "/"
 
 
 class MyAccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
@@ -62,7 +64,6 @@ class MyAccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
         _ = phone
         _ = code
         _ = kwargs
-        pass
 
     def set_phone(self, user: Any, phone: str, verified: bool = False) -> None:
         """Set phone number for user."""
@@ -71,7 +72,6 @@ class MyAccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
         _ = user
         _ = phone
         _ = verified
-        pass
 
     def set_phone_verified(self, user: Any, phone: str, verified: bool = True) -> None:
         """Set phone verification status."""
@@ -80,4 +80,3 @@ class MyAccountAdapter(DefaultAccountAdapter):  # type: ignore[misc]
         _ = user
         _ = phone
         _ = verified
-        pass

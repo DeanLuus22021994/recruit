@@ -7,26 +7,37 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 
+logger = logging.getLogger(__name__)
+
 # Try importing SendGrid with proper error handling
 try:
-    import sendgrid
-    from sendgrid.helpers.mail import Mail
-    SENDGRID_AVAILABLE = True
-except ImportError:
-    SENDGRID_AVAILABLE = False
-    # Create stub classes for type hints when SendGrid is not available
-    class Mail:  # type: ignore
-        def __init__(self, *args: Any, **kwargs: Any) -> None:
-            pass
+    import sendgrid  # type: ignore[import]
+    from sendgrid.helpers.mail import Mail  # type: ignore[import]
     
-    class SendGridAPIClient:  # type: ignore
+    def is_sendgrid_available() -> bool:
+        """Check if SendGrid is available."""
+        return True
+        
+except ImportError:
+    # Create stub classes for type hints when SendGrid is not available
+    sendgrid = None  # type: ignore
+    
+    class Mail:  # type: ignore
+        """Stub Mail class."""
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             pass
         
-        def send(self, *args: Any, **kwargs: Any) -> Any:
+        def add_cc(self, email: str) -> None:
+            """Add CC recipient."""
             pass
-
-logger = logging.getLogger(__name__)
+            
+        def add_bcc(self, email: str) -> None:
+            """Add BCC recipient."""
+            pass
+    
+    def is_sendgrid_available() -> bool:
+        """Check if SendGrid is available."""
+        return False
 
 
 class SendGridBackend(BaseEmailBackend):
@@ -68,8 +79,8 @@ class SendGridBackend(BaseEmailBackend):
         """
         if not email_messages:
             return 0
-            
-        if not SENDGRID_AVAILABLE:
+
+        if not is_sendgrid_available():
             logger.warning("SendGrid library is not available. No emails sent.")
             return 0
 
@@ -77,9 +88,11 @@ class SendGridBackend(BaseEmailBackend):
             logger.error("SendGrid credentials not configured properly.")
             if not self.fail_silently:
                 raise ValueError("SendGrid API key or username/password required")
-            return 0        # Initialize SendGrid client
+            return 0
+        
+        # Initialize SendGrid client
         try:
-            if SENDGRID_AVAILABLE:
+            if sendgrid is not None:
                 sg = sendgrid.SendGridAPIClient(api_key=self.api_key)
             else:
                 return 0
@@ -90,7 +103,7 @@ class SendGridBackend(BaseEmailBackend):
             return 0
 
         num_sent = 0
-          for message in email_messages:
+        for message in email_messages:
             try:
                 sent = self._send_single_message(sg, message)
                 if sent:
@@ -146,12 +159,13 @@ class SendGridBackend(BaseEmailBackend):
             
             # Send the email
             response = sg_client.send(mail)
-              # Check response status
-            if response.status_code in [200, 201, 202]:
+            
+            # Check response status
+            if hasattr(response, 'status_code') and response.status_code in [200, 201, 202]:
                 logger.info("Email sent successfully to %s", message.to)
                 return True
             else:
-                logger.warning("SendGrid returned status %s: %s", response.status_code, response.body)
+                logger.warning("SendGrid returned unexpected response")
                 return False
                 
         except Exception as e:
@@ -181,8 +195,9 @@ class SendGridBackend(BaseEmailBackend):
             attachments: List of attachment tuples (filename, content, mimetype)
         """
         try:
-            from sendgrid.helpers.mail import Attachment
             import base64
+
+            from sendgrid.helpers.mail import Attachment  # type: ignore[import]
             
             for attachment in attachments:
                 if len(attachment) >= 2:
@@ -199,11 +214,12 @@ class SendGridBackend(BaseEmailBackend):
                     attached_file = Attachment(
                         file_content=encoded_content,
                         file_name=filename,
-                        file_type=mimetype,
-                        disposition='attachment'
+                        file_type=mimetype
                     )
+                    
                     mail.add_attachment(attached_file)
-                      except ImportError:
+                    
+        except ImportError:
             logger.warning("SendGrid attachment support not available")
         except Exception as e:
             logger.error("Error adding attachments: %s", e)

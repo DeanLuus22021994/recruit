@@ -1,0 +1,29 @@
+[tool.mypy]
+python_version = "3.8"
+strict = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+  "allauth.*",
+  "phonenumber_field.*",
+  "sendgrid.*",
+  "storages.*",
+  "boto3.*",
+  "botocore.*",
+  "model_bakery.*",
+  "django_extensions.*",
+  "bootstrap3.*",
+  "django_countries.*",
+  "localflavor.*",
+]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "recruit.settings"

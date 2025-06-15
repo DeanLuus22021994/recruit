@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from .models import UserProfile
 
 
-class UserCreationForm(forms.ModelForm[User]):
+class UserCreationForm(forms.ModelForm):
     """Form for creating new users."""
 
     class Meta:
@@ -40,7 +40,7 @@ class UserCreationForm(forms.ModelForm[User]):
         return user
 
 
-class UserChangeForm(forms.ModelForm[User]):
+class UserChangeForm(forms.ModelForm):
     """Form for updating users."""
 
     password = ReadOnlyPasswordHashField()
@@ -54,7 +54,7 @@ class UserChangeForm(forms.ModelForm[User]):
         return str(self.initial.get("password", ""))
 
 
-class UserProfileInline(admin.StackedInline[UserProfile, User]):
+class UserProfileInline(admin.StackedInline):
     """Inline admin for user profiles."""
 
     model = UserProfile
@@ -62,7 +62,7 @@ class UserProfileInline(admin.StackedInline[UserProfile, User]):
     can_delete = False
 
 
-class UserAdmin(BaseUserAdmin[User]):
+class UserAdmin(BaseUserAdmin):
     """Admin interface for User model."""
 
     form = UserChangeForm

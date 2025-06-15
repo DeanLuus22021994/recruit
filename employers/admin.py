@@ -2,15 +2,15 @@
 
 from django.contrib import admin
 
-from .models import Employer, EmployerRequirements, EmployerImages
+from .models import Employer, EmployerImages, EmployerRequirements
 
 
 class EmployerRequirementsInline(admin.StackedInline):
     """Inline admin for employer requirements."""
 
-    model = Employer
+    model = EmployerRequirements
     can_delete = False
-    verbose_name_plural = 'Preferences'
+    verbose_name_plural = "Preferences"
 
 
 class EmployerImagesInline(admin.StackedInline):
@@ -18,8 +18,8 @@ class EmployerImagesInline(admin.StackedInline):
 
     model = EmployerImages
     can_delete = True
-    verbose_name_plural = 'Employer Images'
-    exclude = ('thumb',)
+    verbose_name_plural = "Employer Images"
+    exclude = ("thumb",)
 
 
 class EmployerAdmin(admin.ModelAdmin):
@@ -27,7 +27,7 @@ class EmployerAdmin(admin.ModelAdmin):
 
     # inlines = (EmployerRequirementsInline,)
     inlines = (EmployerImagesInline,)
-    exclude = ('password', 'last_login', 'is_staff', 'business_license_thumb')
+    exclude = ("password", "last_login", "is_staff", "business_license_thumb")
 
 
 admin.site.register(Employer, EmployerAdmin)
