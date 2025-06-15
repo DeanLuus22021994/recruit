@@ -39,7 +39,7 @@ class CandidateRequirementsType(Protocol):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the candidate requirements instance."""
-    
+
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the candidate requirements instance."""
         ...
