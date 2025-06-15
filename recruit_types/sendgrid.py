@@ -35,7 +35,7 @@ class EmailTemplateType(Protocol):
 
     def __str__(self) -> str:
         """Return string representation of the email template."""
-        ...
+        return ""  # Protocol methods should have a default implementation
 
 
 @runtime_checkable

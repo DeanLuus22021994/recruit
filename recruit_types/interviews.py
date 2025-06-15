@@ -75,4 +75,4 @@ class ExclusionType(Protocol):
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the exclusion instance."""
-        ...
+        return (0, {})  # Protocol methods should have a default implementation

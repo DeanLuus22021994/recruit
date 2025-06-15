@@ -17,12 +17,12 @@ class UserProfileType(Protocol):
 
     def generate_token(self) -> str:
         """Generate a token for the user."""
-        ...
+        return ""  # Protocol methods should have a default implementation
 
     @staticmethod
     def verify_token(token: Optional[str], max_age: int = 604800) -> Optional[User]:
         """Verify a token and return the associated user."""
-        ...
+        return None  # Protocol methods should have a default implementation
 
 
 class TokenVerificationResult:

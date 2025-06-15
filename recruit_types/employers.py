@@ -22,11 +22,10 @@ class EmployerType(Protocol):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the employer instance."""
-        ...
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the employer instance."""
-        ...
+        return (0, {})  # Protocol methods should have a default implementation
 
 
 @runtime_checkable
@@ -54,8 +53,7 @@ class EmployerImagesType(Protocol):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the image instance."""
-        ...
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the image instance."""
-        ...
+        return (0, {})  # Protocol methods should have a default implementation

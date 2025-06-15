@@ -27,7 +27,7 @@ class CandidateType(Protocol):
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the candidate instance."""
-        ...
+        return (0, {})  # Protocol methods should have a default implementation
 
 
 @runtime_checkable
@@ -42,7 +42,7 @@ class CandidateRequirementsType(Protocol):
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the candidate requirements instance."""
-        ...
+        return (0, {})  # Protocol methods should have a default implementation
 
 
 @runtime_checkable
@@ -58,4 +58,4 @@ class CandidateDocumentType(Protocol):
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the document instance."""
-        ...
+        return (0, {})  # Protocol methods should have a default implementation
