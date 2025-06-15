@@ -21,6 +21,8 @@ class EmailTemplate(models.Model):
     updated_at: models.DateTimeField = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """Meta configuration for EmailTemplate model."""
+
         app_label = "sendgrid"
         ordering = ["name"]
 
@@ -46,6 +48,8 @@ class EmailLog(models.Model):
     error_message: models.TextField = models.TextField(blank=True)
 
     class Meta:
+        """Meta configuration for EmailLog model."""
+
         app_label = "sendgrid"
         ordering = ["-sent_at"]
         indexes = [

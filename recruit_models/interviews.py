@@ -44,10 +44,10 @@ class InterviewInvitation(models.Model):
 class InterviewRequest(models.Model):
     """Model for interview requests."""
 
-    candidate = models.ForeignKey(
+    candidate: models.ForeignKey = models.ForeignKey(
         Candidate, related_name="requested_jobs", on_delete=models.CASCADE
     )
-    job = models.ForeignKey(
+    job: models.ForeignKey = models.ForeignKey(
         Job, related_name="requested_candidates", on_delete=models.CASCADE
     )
     candidate_accepted = models.BooleanField(null=True, blank=True)

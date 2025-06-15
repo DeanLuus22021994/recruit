@@ -16,15 +16,21 @@ except ImportError:
 class Recruiter(models.Model):
     """Model representing a recruiter user."""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user: models.OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = PhoneNumberField(max_length=20)
-    date_of_birth = models.DateField()
-    location = models.CharField(max_length=100)
-    image = models.ImageField(upload_to="recruiter/%Y/%m/%d")
-    thumb = models.ImageField(upload_to="recruiter/%Y/%m/%d", blank=True)
-    is_active = models.BooleanField(default=True)
-    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    date_of_birth: models.DateField = models.DateField()
+    location: models.CharField = models.CharField(max_length=100)
+    image: models.ImageField = models.ImageField(upload_to="recruiter/%Y/%m/%d")
+    thumb: models.ImageField = models.ImageField(
+        upload_to="recruiter/%Y/%m/%d", blank=True
+    )
+    is_active: models.BooleanField = models.BooleanField(default=True)
+    last_modified: models.DateTimeField = models.DateTimeField(
+        auto_now_add=False, auto_now=True
+    )
+    created: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, auto_now=False
+    )
 
     class Meta:
         app_label = "recruiters"

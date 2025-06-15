@@ -13,10 +13,10 @@ from recruit.choices import EDUCATION_CHOICES, EMPLOYER_TYPE_CHOICES
 class Candidate(models.Model):
     """Model representing a job candidate implementing CandidateType."""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    birth_year = models.CharField(max_length=4, blank=False)
-    date_of_birth = models.DateField(blank=True, null=True)
-    gender = models.CharField(
+    user: models.OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE)
+    birth_year: models.CharField = models.CharField(max_length=4, blank=False)
+    date_of_birth: models.DateField = models.DateField(blank=True, null=True)
+    gender: models.CharField = models.CharField(
         choices=(
             ("male", "Male"),
             ("female", "Female"),
@@ -25,18 +25,24 @@ class Candidate(models.Model):
         blank=True,
         null=True,
     )
-    education = models.CharField(
+    education: models.CharField = models.CharField(
         max_length=25,
         blank=True,
         choices=EDUCATION_CHOICES,
     )
-    education_major = models.CharField(max_length=250, blank=True)
-    current_location = CountryField(blank=True)
-    image = models.ImageField(upload_to="employer/%Y/%m/%d")
-    thumb = models.ImageField(upload_to="employer/%Y/%m/%d", blank=True)
-    is_active = models.BooleanField(default=True)
-    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    education_major: models.CharField = models.CharField(max_length=250, blank=True)
+    current_location: CountryField = CountryField(blank=True)
+    image: models.ImageField = models.ImageField(upload_to="employer/%Y/%m/%d")
+    thumb: models.ImageField = models.ImageField(
+        upload_to="employer/%Y/%m/%d", blank=True
+    )
+    is_active: models.BooleanField = models.BooleanField(default=True)
+    last_modified: models.DateTimeField = models.DateTimeField(
+        auto_now_add=False, auto_now=True
+    )
+    created: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, auto_now=False
+    )
 
     class Meta:
         app_label = "candidates"
@@ -81,8 +87,8 @@ post_save.connect(update_user_profile, sender=Candidate)
 class CandidateRequirements(models.Model):
     """Model for candidate requirements and preferences implementing CandidateRequirementsType."""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    employer_type = models.CharField(
+    user: models.OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE)
+    employer_type: models.CharField = models.CharField(
         max_length=25,
         blank=True,
         choices=EMPLOYER_TYPE_CHOICES,
@@ -95,12 +101,18 @@ class CandidateRequirements(models.Model):
 class CandidateDocument(models.Model):
     """Model for candidate documents like resumes implementing CandidateDocumentType."""
 
-    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
-    document = models.FileField(upload_to="candidate/%Y/%m/%d")
-    document_type = models.CharField(max_length=50)
-    is_active = models.BooleanField(default=True)
-    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    candidate: models.ForeignKey = models.ForeignKey(
+        Candidate, on_delete=models.CASCADE
+    )
+    document: models.FileField = models.FileField(upload_to="candidate/%Y/%m/%d")
+    document_type: models.CharField = models.CharField(max_length=50)
+    is_active: models.BooleanField = models.BooleanField(default=True)
+    last_modified: models.DateTimeField = models.DateTimeField(
+        auto_now_add=False, auto_now=True
+    )
+    created: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, auto_now=False
+    )
 
     class Meta:
         app_label = "candidates"
