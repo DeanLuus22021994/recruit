@@ -1,6 +1,6 @@
 """Type definitions for the sendgrid application."""
 
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from django.db import models
 
@@ -27,8 +27,11 @@ class EmailTemplateType(Protocol):
     plain_content: str
     sendgrid_template_id: str
     is_active: bool
-    created_at: models.DateTimeField
-    updated_at: models.DateTimeField
+    created_at: models.DateTimeField[Any, Any]
+    updated_at: models.DateTimeField[Any, Any]
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """Save the email template instance."""
 
 
 @runtime_checkable
@@ -41,6 +44,12 @@ class EmailLogType(Protocol):
     template: "EmailTemplateType"
     sendgrid_message_id: str
     status: str
-    sent_at: models.DateTimeField
-    delivered_at: models.DateTimeField
+    sent_at: models.DateTimeField[Any, Any]
+    delivered_at: models.DateTimeField[Any, Any]
     error_message: str
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """Save the email log instance."""
+
+    def delete(self, *args: Any, **kwargs: Any) -> None:
+        """Delete the email log instance."""

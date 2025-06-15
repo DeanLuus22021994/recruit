@@ -1,6 +1,7 @@
 """Type definitions for the candidates application."""
 
-from typing import Any, Dict, Protocol, Tuple, runtime_checkable
+from typing import Any, Dict, Optional, Protocol, Tuple, runtime_checkable
+from datetime import date
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -12,7 +13,7 @@ class CandidateType(Protocol):
 
     user: User
     birth_year: str
-    date_of_birth: models.DateField
+    date_of_birth: models.DateField[Optional[date], date]
     gender: str
     education: str
     education_major: str
@@ -23,11 +24,9 @@ class CandidateType(Protocol):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the candidate instance."""
-        ...
 
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the candidate instance."""
-        ...
 
 
 @runtime_checkable
@@ -36,6 +35,12 @@ class CandidateRequirementsType(Protocol):
 
     user: User
     employer_type: str
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """Save the candidate requirements instance."""
+
+    def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
+        """Delete the candidate requirements instance."""
 
 
 @runtime_checkable
@@ -47,6 +52,8 @@ class CandidateDocumentType(Protocol):
     document_type: str
     is_active: bool
 
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """Save the document instance."""
+
     def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
         """Delete the document instance."""
-        ...

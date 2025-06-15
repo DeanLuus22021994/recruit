@@ -1,6 +1,6 @@
 """Type definitions for the recruiters application."""
 
-from typing import Any, Dict, Protocol, Tuple, runtime_checkable
+from typing import Any, Optional, Protocol, runtime_checkable
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -12,7 +12,7 @@ class RecruiterType(Protocol):
 
     user: User
     phone_number: Any  # PhoneNumberField or CharField
-    date_of_birth: models.DateField
+    date_of_birth: models.DateField[Optional[Any], Optional[Any]]
     location: str
     image: models.ImageField
     thumb: models.ImageField
@@ -20,8 +20,6 @@ class RecruiterType(Protocol):
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         """Save the recruiter instance."""
-        ...
 
-    def delete(self, *args: Any, **kwargs: Any) -> Tuple[int, Dict[str, int]]:
+    def delete(self, *args: Any, **kwargs: Any) -> None:
         """Delete the recruiter instance."""
-        ...
