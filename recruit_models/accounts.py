@@ -25,11 +25,15 @@ except ImportError:
 class UserProfile(models.Model):
     """Model for user profiles implementing UserProfileType."""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    timezone = models.CharField(choices=TIMEZONE_CHOICES, max_length=50, blank=True)
-    citizenship = CountryField(blank_label="(Select country)")
-    skype_id = models.CharField(max_length=50, blank=True)
-    user_type = models.CharField(
+    user: models.OneToOneField[User, "UserProfile"] = models.OneToOneField(
+        User, on_delete=models.CASCADE
+    )
+    timezone: models.CharField[str, str] = models.CharField(
+        choices=TIMEZONE_CHOICES, max_length=50, blank=True
+    )
+    citizenship: CountryField = CountryField(blank_label="(Select country)")
+    skype_id: models.CharField[str, str] = models.CharField(max_length=50, blank=True)
+    user_type: models.CharField[str, str] = models.CharField(
         choices=(
             ("Candidate", "Candidate"),
             ("Recruiter", "Recruiter"),
@@ -37,8 +41,12 @@ class UserProfile(models.Model):
         ),
         max_length=50,
     )
-    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    last_modified: models.DateTimeField = models.DateTimeField(
+        auto_now_add=False, auto_now=True
+    )
+    created: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, auto_now=False
+    )
 
     class Meta:
         app_label = "accounts"

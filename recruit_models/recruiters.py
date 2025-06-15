@@ -16,10 +16,12 @@ except ImportError:
 class Recruiter(models.Model):
     """Model representing a recruiter user."""
 
-    user: models.OneToOneField = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = PhoneNumberField(max_length=20)
+    user: models.OneToOneField[User, "Recruiter"] = models.OneToOneField(
+        User, on_delete=models.CASCADE
+    )
+    phone_number: PhoneNumberField = PhoneNumberField(max_length=20)
     date_of_birth: models.DateField = models.DateField()
-    location: models.CharField = models.CharField(max_length=100)
+    location: models.CharField[str, str] = models.CharField(max_length=100)
     image: models.ImageField = models.ImageField(upload_to="recruiter/%Y/%m/%d")
     thumb: models.ImageField = models.ImageField(
         upload_to="recruiter/%Y/%m/%d", blank=True

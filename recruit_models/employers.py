@@ -1,6 +1,6 @@
 """Models for the employers application."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -19,19 +19,35 @@ from recruit.choices import EDUCATION_CHOICES
 class Employer(models.Model):
     """Model representing an employer."""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = PhoneNumberField(blank=False)
-    name_english = models.CharField(blank=False, max_length=200)
-    name_local = models.CharField(blank=False, max_length=200)
-    address_english = models.CharField(blank=False, max_length=200)
-    address_local = models.CharField(blank=False, max_length=200)
-    business_license = models.ImageField(upload_to="employer/%Y/%m/%d")
-    business_license_thumb = models.ImageField(
+    user: models.OneToOneField[User, "Employer"] = models.OneToOneField(
+        User, on_delete=models.CASCADE
+    )
+    phone_number: PhoneNumberField = PhoneNumberField(blank=False)
+    name_english: models.CharField[str, str] = models.CharField(
+        blank=False, max_length=200
+    )
+    name_local: models.CharField[str, str] = models.CharField(
+        blank=False, max_length=200
+    )
+    address_english: models.CharField[str, str] = models.CharField(
+        blank=False, max_length=200
+    )
+    address_local: models.CharField[str, str] = models.CharField(
+        blank=False, max_length=200
+    )
+    business_license: models.ImageField = models.ImageField(
+        upload_to="employer/%Y/%m/%d"
+    )
+    business_license_thumb: models.ImageField = models.ImageField(
         upload_to="employer/%Y/%m/%d", blank=True
     )
-    is_active = models.BooleanField(default=True)
-    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False)
+    is_active: models.BooleanField = models.BooleanField(default=True)
+    last_modified: models.DateTimeField = models.DateTimeField(
+        auto_now_add=False, auto_now=True
+    )
+    created: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, auto_now=False
+    )
 
     class Meta:
         app_label = "employers"
@@ -51,7 +67,7 @@ class Employer(models.Model):
         """Delete the employer instance and associated files."""
         from recruit.utils import delete_from_s3
 
-        instances_list = [self.business_license, self.business_license_thumb]
+        instances_list: List[Any] = [self.business_license, self.business_license_thumb]
         if hasattr(self, "images") and self.images.count() > 0:
             for image in self.images.all():
                 instances_list.extend([image.image, image.thumb])
@@ -79,17 +95,23 @@ post_save.connect(update_user_profile, sender=Employer)
 class EmployerRequirements(models.Model):
     """Model for employer requirements."""
 
-    employer = models.OneToOneField(Employer, on_delete=models.CASCADE)
-    education = models.CharField(
+    employer: models.OneToOneField[Employer, "EmployerRequirements"] = (
+        models.OneToOneField(Employer, on_delete=models.CASCADE)
+    )
+    education: models.CharField[str, str] = models.CharField(
         max_length=25,
         blank=True,
         choices=EDUCATION_CHOICES,
     )
-    education_major = models.CharField(max_length=50, blank=True)
-    age_range_low = models.IntegerField(blank=True, null=True)
-    age_range_high = models.IntegerField(blank=True, null=True)
-    years_of_experience = models.IntegerField(blank=True, null=True)
-    citizenship = CountryField(blank=True)
+    education_major: models.CharField[str, str] = models.CharField(
+        max_length=50, blank=True
+    )
+    age_range_low: models.IntegerField = models.IntegerField(blank=True, null=True)
+    age_range_high: models.IntegerField = models.IntegerField(blank=True, null=True)
+    years_of_experience: models.IntegerField = models.IntegerField(
+        blank=True, null=True
+    )
+    citizenship: CountryField = CountryField(blank=True)
 
     class Meta:
         app_label = "employers"
@@ -98,15 +120,21 @@ class EmployerRequirements(models.Model):
 class EmployerImages(models.Model):
     """Model for employer images."""
 
-    employer = models.ForeignKey(
+    employer: models.ForeignKey[Employer, "EmployerImages"] = models.ForeignKey(
         Employer, on_delete=models.CASCADE, related_name="images"
     )
-    cover_image = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    last_modified = models.DateTimeField(auto_now_add=False, auto_now=True)
-    created = models.DateTimeField(auto_now_add=True, auto_now=False)
-    image = models.ImageField(upload_to="employer/%Y/%m/%d")
-    thumb = models.ImageField(upload_to="employer/%Y/%m/%d", blank=True)
+    cover_image: models.BooleanField = models.BooleanField(default=False)
+    is_active: models.BooleanField = models.BooleanField(default=True)
+    last_modified: models.DateTimeField = models.DateTimeField(
+        auto_now_add=False, auto_now=True
+    )
+    created: models.DateTimeField = models.DateTimeField(
+        auto_now_add=True, auto_now=False
+    )
+    image: models.ImageField = models.ImageField(upload_to="employer/%Y/%m/%d")
+    thumb: models.ImageField = models.ImageField(
+        upload_to="employer/%Y/%m/%d", blank=True
+    )
 
     class Meta:
         app_label = "employers"

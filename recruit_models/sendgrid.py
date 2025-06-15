@@ -9,11 +9,11 @@ from recruit_types.sendgrid import EMAIL_STATUS_CHOICES
 class EmailTemplate(models.Model):
     """Model for storing reusable email templates."""
 
-    name: models.CharField = models.CharField(max_length=100, unique=True)
-    subject: models.CharField = models.CharField(max_length=200)
-    html_content: models.TextField = models.TextField(blank=True)
-    plain_content: models.TextField = models.TextField(blank=True)
-    sendgrid_template_id: models.CharField = models.CharField(
+    name: models.CharField[str, str] = models.CharField(max_length=100, unique=True)
+    subject: models.CharField[str, str] = models.CharField(max_length=200)
+    html_content: models.TextField[str, str] = models.TextField(blank=True)
+    plain_content: models.TextField[str, str] = models.TextField(blank=True)
+    sendgrid_template_id: models.CharField[str, str] = models.CharField(
         max_length=100, blank=True
     )
     is_active: models.BooleanField = models.BooleanField(default=True)
@@ -33,19 +33,21 @@ class EmailTemplate(models.Model):
 class EmailLog(models.Model):
     """Model for tracking sent emails implementing EmailLogType."""
 
-    recipient: models.EmailField = models.EmailField()
-    sender: models.EmailField = models.EmailField()
-    subject: models.CharField = models.CharField(max_length=200)
-    template: models.ForeignKey = models.ForeignKey(
+    recipient: models.EmailField[str, str] = models.EmailField()
+    sender: models.EmailField[str, str] = models.EmailField()
+    subject: models.CharField[str, str] = models.CharField(max_length=200)
+    template: models.ForeignKey[EmailTemplate, "EmailLog"] = models.ForeignKey(
         EmailTemplate, on_delete=models.SET_NULL, null=True, blank=True
     )
-    sendgrid_message_id: models.CharField = models.CharField(max_length=200, blank=True)
-    status: models.CharField = models.CharField(
+    sendgrid_message_id: models.CharField[str, str] = models.CharField(
+        max_length=200, blank=True
+    )
+    status: models.CharField[str, str] = models.CharField(
         max_length=20, choices=EMAIL_STATUS_CHOICES, default="pending"
     )
     sent_at: models.DateTimeField = models.DateTimeField(default=timezone.now)
     delivered_at: models.DateTimeField = models.DateTimeField(null=True, blank=True)
-    error_message: models.TextField = models.TextField(blank=True)
+    error_message: models.TextField[str, str] = models.TextField(blank=True)
 
     class Meta:
         """Meta configuration for EmailLog model."""
